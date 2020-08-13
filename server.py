@@ -1,4 +1,9 @@
 import requests
+import os
+from slack import WebClient
+
+SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
+SLACK_CHANNEL = "#planter"
 
 url = "https://sfbay.craigslist.org/search/sss?query=pot+%7C+planter+%7C+raised+bed+%7C+garden+bed&sort=rel&hasPic=1"
 
@@ -36,3 +41,15 @@ first_cl_title_text = first_cl_title_class.text
 print(f" title is {first_cl_title_text}")
 first_cl_neighborhood = first_cl_result.find("span", class_="result-hood")
 print(first_cl_neighborhood.text)
+
+
+client = WebClient(SLACK_TOKEN)
+desc = f"{first_cl_price}"
+client.api_call(
+    "client.chat_postMessage",
+    channel=SLACK_CHANNEL,
+    text=first_cl_id,
+    username="craigslist"
+    # icon_emoji=":robot_face:",
+)
+
