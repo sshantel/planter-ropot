@@ -1,7 +1,7 @@
 import requests
 import os
 
-from slack import WebClient
+# from slack import WebClient
 from bs4 import BeautifulSoup as b_s
 
 
@@ -31,19 +31,20 @@ def search_query(region, term):
         # print(links)
         posting_body = []
     for link in links:
-        print(links)
+        print(link)
         # print(f"link is {link}")
         response_link = requests.get(url=link)
         link_soup = b_s(response_link.content, "html.parser")
-        print(f"this is link soup {link_soup}")
+        # print(f"this is link soup {link_soup}")
         section_body_class = link_soup.find("section", id="postingbody")
-        print(f"section body class is {section_body_class}")
-        print(f"section body class text is {section_body_class.text}")
+        # print(f"section body class is {section_body_class}")
+        # print(f"section body class text is {section_body_class.text}")
         item_description = "".join(section_body_class.text)
         print(f"item description is {item_description}")
         stripped = item_description.replace("\n\nQR Code Link to This Post\n", "")
+        print(f"stripped is {stripped}")
         final_strip = stripped.replace("\n\n", "")
-        # print(final_strip)
+        print(f"final strip is {final_strip}")
         final_final_strip = final_strip.rstrip()
         print(f"final final strip is{final_final_strip}")
         # posting_body.append(section_body_class.text)
@@ -58,27 +59,29 @@ def search_query(region, term):
 
         # print(first_cl_result)
         # print(results)
-        for post in posts:
-            result_price = post.find("span", class_="result-price")
-            # print(result_price.text)
-            price_test = post.a
-            # print(price_test)
-            time_class = post.find("time", class_="result-date")
-            datetime = time_class["datetime"]
-            # print(datetime)
-            title_class = post.find("a", class_="result-title hdrlnk")
-            link = title_class["href"]
-            # print(link)
-            cl_id = title_class["data-id"]  #     print(cl_id)
-            title_text = title_class.text
-            # print(title_text)
-            neighborhood = post.find("span", class_="result-hood")
-            print(f"this is neighborhood {neighborhood}")
+    for post in posts:
+        result_price = post.find("span", class_="result-price")
+        # print(result_price.text)
+        price_test = post.a
+        # print(price_test)
+        time_class = post.find("time", class_="result-date")
+        datetime = time_class["datetime"]
+        # print(datetime)
+        title_class = post.find("a", class_="result-title hdrlnk")
+        url = title_class["href"]
+        cl_id = title_class["data-id"]  #     print(cl_id)
+        title_text = title_class.text
+        # print(title_text)
+        neighborhood = post.find("span", class_="result-hood")
+        # print(f"this is neighborhood {neighborhood}")
+        if neighborhood is not None:
             neighborhood_text = neighborhood.text
-            client = WebClient(SLACK_TOKEN)
-            desc = f" {result_price.text} | {title_text} | {datetime} | {link} | {neighborhood_text} | {poop}"
-            response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
-            print(response)
+        else:
+            neighborhood_text = "No neighborhood provided"
+        client = WebClient(SLACK_TOKEN)
+        desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {poop}"
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
+        # print(response)
 
         alok_1_geo = os.environ["ALOK_1_GEO"]
         alok_2_geo = os.environ["ALOK_2_GEO"]
