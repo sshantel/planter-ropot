@@ -9,16 +9,23 @@ SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter"
 
 
-def search_query(region, term):
-    url = f"https://{region}.craigslist.org/search/sss?query={term}".format(
-        region=region, term=term
-    )
-    print(f"url is {url}")
-    response = requests.get(url=url)
+def craigslist_soup(region, term, parser):
+    url = f"https://{region}.craigslist.org/search/sss?query={term}"
+    print(url)
 
-    craigslist_soup = b_s(response.content, "html.parser")
-    # print(craigslist_soup[0])
-    posts = craigslist_soup.find_all("li", class_="result-row")
+    response = requests.get(url=url)
+    print(response)
+    soup = b_s(response.content, parser)
+    print(soup)
+
+    return soup
+
+
+c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser")
+
+
+def search_query(craigslist_soup):
+    posts = c_l.find_all("li", class_="result-row")
     first_cl_result = posts
     # print(first_cl_result)
     links = []
@@ -70,7 +77,7 @@ def search_query(region, term):
             neighborhood_text = "No neighborhood provided"
         client = WebClient(SLACK_TOKEN)
         desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
         # print(response)
 
         alok_1_geo = os.environ["ALOK_1_GEO"]
@@ -85,29 +92,7 @@ def search_query(region, term):
 
         print(alok_1_geo)
 
-        # return posts
 
-        # first_cl_price = first_cl_result.a.text
-        # print(f"first result price is {first_cl_price}")
-        # first_cl_time_class = first_cl_result.find("time", class_="result-date")
-        # print(f"first craigslist time class is {first_cl_time_class}")
-        # first_cl_datetime = first_cl_time_class["datetime"]
-        # print(f"date is {first_cl_datetime}")
-        # first_cl_title_class = first_cl_result.find("a", class_="result-title hdrlnk")
-        # print(f"first cl title class is {first_cl_title_class}")
-        # first_cl_link = first_cl_title_class["href"]
-        # print(f"first_cl_link is {first_cl_link}")
-        # first_cl_id = first_cl_title_class["data-id"]
-        # print(first_cl_id)
-        # first_cl_title_text = first_cl_title_class.text
-        # print(f" title is {first_cl_title_text}")
-        # first_cl_neighborhood = first_cl_result.find("span", class_="result-hood")
-        # print(first_cl_neighborhood.text)
-        # neighborhood = first_cl_neighborhood.text
-
-
-search_query(region="sfbay", term="planter")
-
-
+search_query(craigslist_soup)
 # need functions: slackbot, calculate_distance_from
 
