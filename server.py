@@ -1,7 +1,7 @@
 import requests
 import os
 
-# from slack import WebClient
+from slack import WebClient
 from bs4 import BeautifulSoup as b_s
 
 
@@ -22,6 +22,7 @@ def search_query(region, term):
     first_cl_result = posts
     # print(first_cl_result)
     links = []
+    posting_body = []
     for post in posts:
         # print(post)
         title_class = post.find("a", class_="result-title hdrlnk")
@@ -29,37 +30,26 @@ def search_query(region, term):
         # print(title_class['href'])
         links.append(title_class["href"])
         # print(links)
-        posting_body = []
-    for link in links:
-        print(link)
-        # print(f"link is {link}")
-        response_link = requests.get(url=link)
-        link_soup = b_s(response_link.content, "html.parser")
-        # print(f"this is link soup {link_soup}")
-        section_body_class = link_soup.find("section", id="postingbody")
-        # print(f"section body class is {section_body_class}")
-        # print(f"section body class text is {section_body_class.text}")
-        item_description = "".join(section_body_class.text)
-        print(f"item description is {item_description}")
-        stripped = item_description.replace("\n\nQR Code Link to This Post\n", "")
-        print(f"stripped is {stripped}")
-        final_strip = stripped.replace("\n\n", "")
-        print(f"final strip is {final_strip}")
-        final_final_strip = final_strip.rstrip()
-        print(f"final final strip is{final_final_strip}")
-        # posting_body.append(section_body_class.text)
-        posting_body.append(final_final_strip)
-        poop = "".join(posting_body)
-        # print(posting_body)
-
-        # print(posting_body)
-        # cl_description = link_soup.find("div", class_="print-qrcode")
-        # print(cl_description)
-        # print(cl_description["data-location"])
-
-        # print(first_cl_result)
-        # print(results)
-    for post in posts:
+        for link in links:
+            print(link)
+            # print(f"link is {link}")
+            response_link = requests.get(url=link)
+            link_soup = b_s(response_link.content, "html.parser")
+            # print(f"this is link soup {link_soup}")
+            section_body_class = link_soup.find("section", id="postingbody")
+            # print(f"section body class is {section_body_class}")
+            # print(f"section body class text is {section_body_class.text}")
+            item_description = "".join(section_body_class.text)
+            print(f"item description is {item_description}")
+            stripped = item_description.replace("\n\nQR Code Link to This Post\n", "")
+            print(f"stripped is {stripped}")
+            final_strip = stripped.replace("\n\n", "")
+            print(f"final strip is {final_strip}")
+            final_final_strip = final_strip.rstrip()
+            print(f"final final strip is{final_final_strip}")
+            # posting_body.append(section_body_class.text)
+            posting_body.append(final_final_strip)
+            poop = "".join(posting_body)
         result_price = post.find("span", class_="result-price")
         # print(result_price.text)
         price_test = post.a
@@ -69,7 +59,7 @@ def search_query(region, term):
         # print(datetime)
         title_class = post.find("a", class_="result-title hdrlnk")
         url = title_class["href"]
-        cl_id = title_class["data-id"]  #     print(cl_id)
+        cl_id = title_class["data-id"]
         title_text = title_class.text
         # print(title_text)
         neighborhood = post.find("span", class_="result-hood")
@@ -79,7 +69,7 @@ def search_query(region, term):
         else:
             neighborhood_text = "No neighborhood provided"
         client = WebClient(SLACK_TOKEN)
-        desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {poop}"
+        desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
         # print(response)
 
