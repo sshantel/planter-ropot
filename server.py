@@ -4,6 +4,13 @@ import os
 from slack import WebClient
 from bs4 import BeautifulSoup as b_s
 
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
+from sqlalchemy.orm import sessionmaker
+
+import csv
+
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter"
@@ -14,9 +21,9 @@ def craigslist_soup(region, term, parser):
     print(url)
 
     response = requests.get(url=url)
-    print(response)
+    # print(response)
     soup = b_s(response.content, parser)
-    print(soup)
+    # print(soup)
 
     return soup
 
@@ -31,14 +38,13 @@ def search_query(craigslist_soup):
     links = []
     posting_body = []
     for post in posts:
-        # print(post)
         title_class = post.find("a", class_="result-title hdrlnk")
         # print(f"title class is {title_class}")
         # print(title_class['href'])
         links.append(title_class["href"])
         # print(links)
         for link in links:
-            print(link)
+            # print(link)
             # print(f"link is {link}")
             response_link = requests.get(url=link)
             link_soup = b_s(response_link.content, "html.parser")
@@ -46,17 +52,20 @@ def search_query(craigslist_soup):
             section_body_class = link_soup.find("section", id="postingbody")
             # print(f"section body class is {section_body_class}")
             # print(f"section body class text is {section_body_class.text}")
-            item_description = "".join(section_body_class.text)
-            print(f"item description is {item_description}")
+            poopoo = section_body_class.text
+            item_description = "".join(poopoo)
+            # .text
+            # print(f"item description is {item_description}")
             stripped = item_description.replace("\n\nQR Code Link to This Post\n", "")
-            print(f"stripped is {stripped}")
+            # print(f"stripped is {stripped}")
             final_strip = stripped.replace("\n\n", "")
-            print(f"final strip is {final_strip}")
+            # print(f"final strip is {final_strip}")
             final_final_strip = final_strip.rstrip()
-            print(f"final final strip is{final_final_strip}")
+            # print(f"final final strip is{final_final_strip}")
             # posting_body.append(section_body_class.text)
             posting_body.append(final_final_strip)
             poop = "".join(posting_body)
+            # print(poop)
         result_price = post.find("span", class_="result-price")
         # print(result_price.text)
         price_test = post.a
@@ -74,25 +83,87 @@ def search_query(craigslist_soup):
         if neighborhood is not None:
             neighborhood_text = neighborhood.text
         else:
-            neighborhood_text = "No neighborhood provided"
-        client = WebClient(SLACK_TOKEN)
-        desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
-        # print(response)
+            neighborhood_text == "No neighborhood provided"
+    with open("listings.csv", "a") as csvfile:
+        fieldnames = [
+            "id",
+            "created",
+            "name",
+            "price",
+            "location",
+            "url",
+        ]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for price in result_price:
+            writer.writerow(
+                {
+                    "id": cl_id,
+                    "created": datetime,
+                    "name": title_text,
+                    "price": price,
+                    "location": neighborhood_text,
+                    "url": url,
+                }
+            )
+        csvfile.close()
 
-        alok_1_geo = os.environ["ALOK_1_GEO"]
-        alok_2_geo = os.environ["ALOK_2_GEO"]
-        chantel_geo = os.environ["CHANTEL_GEO"]
 
-        DISTANCE_FROM = {
-            "alok_1_geo": alok_1_geo,
-            "alok_2_geo": alok_2_geo,
-            "chantel_geo": chantel_geo,
-        }
+engine = create_engine("sqlite:///listings.db", echo=False)
+print(engine)
+Base = declarative_base()
+print(Base)
 
-        print(alok_1_geo)
 
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+
+class Listing(Base):
+
+    __tablename__ = "listings"
+    id = Column(Integer, primary_key=True)
+    created = Column(String)
+    name = Column(String)
+    price = Column(String)
+    location = Column(String)
+    url = Column(String, unique=True)
+
+
+listing = Listing(url="poop")
+for listing in listings:
+    session.add(listing)
+    session.commit()
+
+
+# def post_to_slack():
+#     client = WebClient(SLACK_TOKEN)
+#     desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
+#     response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+#     # print(response)
+# post_to_slack()
 
 search_query(craigslist_soup)
 # need functions: slackbot, calculate_distance_from
 
+
+# class Contacts(Base):
+#     __tablename__ = "contacts"
+#     contact_id = Column(Integer, primary_key=True)
+#     first_name = Column(String, nullable=False)
+#     last_name = Column(String, nullable=False)
+#     email = Column(String, nullable=False, unique=True)
+#     phone = Column(String, nullable=False, unique=True)
+
+
+# def test_add_to_db():
+#     contact = Contacts(
+#         first_name="poop", last_name="poop", email="poop@gmail.com", phone="900"
+#     )
+#     session.add(contact)
+#     session.commit()
+
+
+# test_add_to_db()
