@@ -11,6 +11,17 @@ from sqlalchemy.orm import sessionmaker
 
 import csv
 
+import sqlite3
+
+conn = sqlite3.connect("poops.db")
+cursor = conn.cursor()
+c = conn.cursor()
+print(c)
+
+c.execute(
+    """CREATE TABLE poops
+             (id integer, created text, name text, price text, location text, url text)"""
+)
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter"
@@ -37,6 +48,10 @@ def search_query(craigslist_soup):
     # print(first_cl_result)
     links = []
     posting_body = []
+    with open("listings.csv", "w", newline="") as csvfile:
+        csv_headers = ["id", "created", "name", "price", "location", "url"]
+        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+        writer.writeheader()
     for post in posts:
         title_class = post.find("a", class_="result-title hdrlnk")
         # print(f"title class is {title_class}")
@@ -84,58 +99,63 @@ def search_query(craigslist_soup):
             neighborhood_text = neighborhood.text
         else:
             neighborhood_text == "No neighborhood provided"
-    with open("listings.csv", "a") as csvfile:
-        fieldnames = [
-            "id",
-            "created",
-            "name",
-            "price",
-            "location",
-            "url",
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for price in result_price:
-            writer.writerow(
-                {
-                    "id": cl_id,
-                    "created": datetime,
-                    "name": title_text,
-                    "price": price,
-                    "location": neighborhood_text,
-                    "url": url,
-                }
-            )
-        csvfile.close()
+        c.execute(
+            "INSERT INTO poops VALUES('poop', 'poop', 'poop', 'poop', 'poop', 'poop')"
+        )
+        conn.commit()
+
+        # with open("listings.csv", "a") as csvfile:
+        #     fieldnames = [
+        #         "id",
+        #         "created",
+        #         "name",
+        #         "price",
+        #         "location",
+        #         "url",
+        #     ]
+        #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        #     # writer.writeheader()
+        #     for price in result_price:
+        #         writer.writerow(
+        #             {
+        #                 "id": cl_id,
+        #                 "created": datetime,
+        #                 "name": title_text,
+        #                 "price": price,
+        #                 "location": neighborhood_text,
+        #                 "url": url,
+        #             }
+        #         )
+        #     csvfile.close()
 
 
-engine = create_engine("sqlite:///listings.db", echo=False)
-print(engine)
-Base = declarative_base()
-print(Base)
+# engine = create_engine("sqlite:///listings.db", echo=False)
+# print(engine)
+# Base = declarative_base()
+# print(Base)
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)
 
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
-class Listing(Base):
-
-    __tablename__ = "listings"
-    id = Column(Integer, primary_key=True)
-    created = Column(String)
-    name = Column(String)
-    price = Column(String)
-    location = Column(String)
-    url = Column(String, unique=True)
+# Session = sessionmaker(bind=engine)
+# session = Session()
 
 
-listing = Listing(url="poop")
-for listing in listings:
-    session.add(listing)
-    session.commit()
+# class Listing(Base):
+
+#     __tablename__ = "listings"
+#     id = Column(Integer, primary_key=True)
+#     created = Column(String)
+#     name = Column(String)
+#     price = Column(String)
+#     location = Column(String)
+#     url = Column(String, unique=True)
+
+
+# listing = Listing(url="poop")
+# for listin in listing:
+#     session.add(listing)
+#     session.commit()
 
 
 # def post_to_slack():
