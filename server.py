@@ -15,7 +15,7 @@ print(c)
 
 c.execute(
     """CREATE TABLE listings
-             (id TEXT UNIQUE,
+             (id INTEGER UNIQUE,
              created TEXT,
              name TEXT,
              price TEXT,
@@ -107,13 +107,10 @@ def search_query(craigslist_soup):
                 )
             csvfile.close()
 
+        client = WebClient(SLACK_TOKEN)
+        desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
 
-# def post_to_slack():
-#     client = WebClient(SLACK_TOKEN)
-#     desc = f" {result_price.text} | {title_text} | {datetime} | {url} | {neighborhood_text} | {final_final_strip}"
-#     response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
-#     # print(response)
-# post_to_slack()
 
 search_query(craigslist_soup)
 
