@@ -13,14 +13,21 @@ import csv
 
 import sqlite3
 
-conn = sqlite3.connect("poops.db")
+# create connection object that represents the database
+conn = sqlite3.connect("listings.db")
 cursor = conn.cursor()
 c = conn.cursor()
 print(c)
 
+# create table
 c.execute(
-    """CREATE TABLE poops
-             (id integer, created text, name text, price text, location text, url text)"""
+    """CREATE TABLE listings
+             (id TEXT UNIQUE,
+             created TEXT,
+             name TEXT,
+             price TEXT,
+             location TEXT NOT NULL,
+             url TEXT NOT NULL UNIQUE)"""
 )
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
@@ -49,7 +56,7 @@ def search_query(craigslist_soup):
     links = []
     posting_body = []
     with open("listings.csv", "w", newline="") as csvfile:
-        csv_headers = ["id", "created", "name", "price", "location", "url"]
+        csv_headers = ["url"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
     for post in posts:
@@ -99,63 +106,37 @@ def search_query(craigslist_soup):
             neighborhood_text = neighborhood.text
         else:
             neighborhood_text == "No neighborhood provided"
-        c.execute(
-            "INSERT INTO poops VALUES('poop', 'poop', 'poop', 'poop', 'poop', 'poop')"
-        )
-        conn.commit()
+        for price in result_price:
+            cursor.execute(
+                "INSERT into listings VALUES(?,?,?,?,?,?)",
+                (cl_id, datetime, title_text, price, neighborhood_text, url,),
+            )
 
-        # with open("listings.csv", "a") as csvfile:
-        #     fieldnames = [
-        #         "id",
-        #         "created",
-        #         "name",
-        #         "price",
-        #         "location",
-        #         "url",
-        #     ]
-        #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        #     # writer.writeheader()
-        #     for price in result_price:
-        #         writer.writerow(
-        #             {
-        #                 "id": cl_id,
-        #                 "created": datetime,
-        #                 "name": title_text,
-        #                 "price": price,
-        #                 "location": neighborhood_text,
-        #                 "url": url,
-        #             }
-        #         )
-        #     csvfile.close()
+            conn.commit()
 
-
-# engine = create_engine("sqlite:///listings.db", echo=False)
-# print(engine)
-# Base = declarative_base()
-# print(Base)
-
-
-# Base.metadata.create_all(engine)
-
-# Session = sessionmaker(bind=engine)
-# session = Session()
-
-
-# class Listing(Base):
-
-#     __tablename__ = "listings"
-#     id = Column(Integer, primary_key=True)
-#     created = Column(String)
-#     name = Column(String)
-#     price = Column(String)
-#     location = Column(String)
-#     url = Column(String, unique=True)
-
-
-# listing = Listing(url="poop")
-# for listin in listing:
-#     session.add(listing)
-#     session.commit()
+        with open("listings.csv", "a") as csvfile:
+            fieldnames = [
+                "id",
+                "created",
+                "name",
+                "price",
+                "location",
+                "url",
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            # writer.writeheader()
+            for price in result_price:
+                writer.writerow(
+                    {
+                        "id": cl_id,
+                        "created": datetime,
+                        "name": title_text,
+                        "price": price,
+                        "location": neighborhood_text,
+                        "url": url,
+                    }
+                )
+            csvfile.close()
 
 
 # def post_to_slack():
@@ -166,24 +147,4 @@ def search_query(craigslist_soup):
 # post_to_slack()
 
 search_query(craigslist_soup)
-# need functions: slackbot, calculate_distance_from
 
-
-# class Contacts(Base):
-#     __tablename__ = "contacts"
-#     contact_id = Column(Integer, primary_key=True)
-#     first_name = Column(String, nullable=False)
-#     last_name = Column(String, nullable=False)
-#     email = Column(String, nullable=False, unique=True)
-#     phone = Column(String, nullable=False, unique=True)
-
-
-# def test_add_to_db():
-#     contact = Contacts(
-#         first_name="poop", last_name="poop", email="poop@gmail.com", phone="900"
-#     )
-#     session.add(contact)
-#     session.commit()
-
-
-# test_add_to_db()
