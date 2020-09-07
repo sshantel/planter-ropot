@@ -1,12 +1,16 @@
 import requests
+
 import os
 
+import slack
 from slack import WebClient
+
 from bs4 import BeautifulSoup as b_s
 
 import csv
 
 import sqlite3
+
 
 conn = sqlite3.connect("listings.db")
 cursor = conn.cursor()
@@ -23,12 +27,15 @@ c.execute(
              url TEXT NOT NULL UNIQUE)"""
 )
 
-SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
+# SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
+SLACK_TOKEN = "xoxb-336675185190-1301453306821-3C1NASWqLNP25aIuf84se8Z7"
 SLACK_CHANNEL = "#planter"
 
 
 def craigslist_soup(region, term, parser):
-    url = f"https://{region}.craigslist.org/search/sss?query={term}"
+    url = "https://{region}.craigslist.org/search/sss?query={term}".format(
+        region=region, term=term
+    )
     print(url)
 
     response = requests.get(url=url)
