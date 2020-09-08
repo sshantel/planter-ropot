@@ -18,7 +18,7 @@ c = conn.cursor()
 print(c)
 
 c.execute(
-    """CREATE TABLE listings
+    """CREATE TABLE IF NOT EXISTS listings
              (id INTEGER UNIQUE,
              created TEXT,
              name TEXT,
