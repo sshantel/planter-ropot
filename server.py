@@ -27,8 +27,7 @@ c.execute(
              url TEXT NOT NULL UNIQUE)"""
 )
 
-# SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
-SLACK_TOKEN = "xoxb-336675185190-1301453306821-3C1NASWqLNP25aIuf84se8Z7"
+SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter"
 
 
