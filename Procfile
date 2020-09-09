@@ -1,1 +1,1 @@
-web: gunicorn craigslist-bot.wsgi
+worker: python3 server.py
