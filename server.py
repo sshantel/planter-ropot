@@ -19,16 +19,16 @@ print(c)
 
 c.execute(
     """CREATE TABLE IF NOT EXISTS listings
-             (id INTEGER UNIQUE,
+             (id INTEGER,
              created TEXT,
              name TEXT,
              price TEXT,
              location TEXT NOT NULL,
-             url TEXT NOT NULL UNIQUE)"""
+             url TEXT NOT NULL)"""
 )
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
-SLACK_CHANNEL = "#planter"
+SLACK_CHANNEL = "#ropot_planter"
 
 
 def craigslist_soup(region, term, parser):
@@ -84,8 +84,8 @@ def search_query(craigslist_soup):
             neighborhood_text == "No neighborhood provided"
         for price in result_price:
             cursor.execute(
-                "INSERT into listings VALUES(?,?,?,?,?,?)",
-                (cl_id, datetime, title_text, price, neighborhood_text, url,),
+                "INSERT OR REPLACE into listings VALUES(?,?,?,?,?,?)",
+                (cl_id, datetime, title_text, price, neighborhood_text, url),
             )
 
             conn.commit()
