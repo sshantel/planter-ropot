@@ -9,6 +9,8 @@ import csv
 
 import sqlite3
 
+import time
+
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
  
@@ -54,17 +56,12 @@ c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser")
 
 def get_links_and_posts(input):
     posts = input.find_all("li", class_="result-row")
-    # print(f'posts is {posts}')
     links_and_posts = {}
     links = []
     for post in posts:
-        # print(f'post is {post}')
         title_class = post.find("a", class_="result-title hdrlnk")
-        # print(title_class)
         links.append(title_class["href"])
-    # print(f'links is {links}')
     links_and_posts = {"links": links, "posts": posts}
-    # print(f'links and posts is {links_and_posts}')
     return links_and_posts
 
 get_links_and_posts(c_l)
@@ -84,19 +81,12 @@ def search_query(craigslist_soup):
             section_body_class_text = section_body_class.text
         else:
             section_body_class_text = 'No description provided'
-        # item_description = "".join(section_body_class_text)
         stripped = section_body_class_text.replace("\n\nQR Code Link to This Post\n", "")
         final_strip = stripped.replace("\n\n", "")
-        # print(final_strip)
-        # final_final_strip = final_strip.rstrip()
         posting_body.append(final_strip)
-        # final_posting_body = "".join(posting_body)
     print(f' *****posting body is {posting_body}')
-    # for index, body in enumerate(posting_body):
-    #     print(index, body)
-    for index, body in enumerate(posting_body):
-        print(index, body)
-    for post in posts:
+    for index, post in enumerate(posts):
+        planter_description = posting_body[index]
         result_price = post.find("span", class_="result-price")
         result_price_text = result_price.get_text()
         time_class = post.find("time", class_="result-date")
@@ -117,20 +107,15 @@ def search_query(craigslist_soup):
             "price": result_price_text,
             "neighborhood_text": neighborhood_text,
             "url": url,
-            "description": body,
+            "description": planter_description,
         }
-        # print(f'result_listings {result_listings}')
         list_results.append(result_listings)
-        # print(f'list_results {list_results}')
-    # print(f'result listings is {result_listings}')
     return list_results 
 
 
 def insert_into_db(result_dictionary):
     c = connect_to_db("listings.db") 
     for item in result_dictionary:
-        # print(f'item is {item}') 
-        # print(f'result_dictionary is {result_dictionary}')
         c[0].execute(
             "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?)",
             (
@@ -148,8 +133,7 @@ def insert_into_db(result_dictionary):
 
 insert_into_db(search_query(craigslist_soup=c_l)) 
 
-def insert_into_csv(result_dictionary):
-    # print(result_dictionary)
+def insert_into_csv(result_dictionary): 
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
             "id",
@@ -184,17 +168,13 @@ insert_into_csv(search_query(craigslist_soup=c_l))
 
 
 def post_to_slack(result_dictionary):
-    client = WebClient(SLACK_TOKEN)
-    # print(client)
-    # print(result_dictionary)
+    client = WebClient(SLACK_TOKEN) 
     desc = ''
-    for item in result_dictionary:
-        # print(f'item is {item}')
-        desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
-        # print(f'desc is {desc}')
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
-    # print(client)
-    # print(response)
+    for item in result_dictionary: 
+        if item not in result_dictionary:
+            desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+            response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+    print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
 
 
 post_to_slack(search_query(craigslist_soup=c_l))
