@@ -133,38 +133,38 @@ def insert_into_db(result_dictionary):
 
 insert_into_db(search_query(craigslist_soup=c_l)) 
 
-def insert_into_csv(result_dictionary): 
-    with open("listings.csv", "a") as csvfile:
-        fieldnames = [
-            "id",
-            "created",
-            "name",
-            "price",
-            "location",
-            "url",
-            "description",
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        for item in result_dictionary:
-            writer.writerow(
-                {
-                    "id": item['cl_id'],
-                    "created": item['datetime'],
-                    "name": item['title_text'],
-                    "price": item['price'],
-                    "location": item['neighborhood_text'],
-                    "url": item['url'],
-                    "description": item['description']
-                }
-            )
-    num_rows = 0
-    for row in open("listings.csv"):
-        num_rows += 1
-    print(num_rows)
-    csvfile.close()
+# def insert_into_csv(result_dictionary): 
+#     with open("listings.csv", "a") as csvfile:
+#         fieldnames = [
+#             "id",
+#             "created",
+#             "name",
+#             "price",
+#             "location",
+#             "url",
+#             "description",
+#         ]
+#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+#         for item in result_dictionary:
+#             writer.writerow(
+#                 {
+#                     "id": item['cl_id'],
+#                     "created": item['datetime'],
+#                     "name": item['title_text'],
+#                     "price": item['price'],
+#                     "location": item['neighborhood_text'],
+#                     "url": item['url'],
+#                     "description": item['description']
+#                 }
+#             )
+#     num_rows = 0
+#     for row in open("listings.csv"):
+#         num_rows += 1
+#     print(num_rows)
+#     csvfile.close()
 
 
-insert_into_csv(search_query(craigslist_soup=c_l))
+# insert_into_csv(search_query(craigslist_soup=c_l))
 
 
 def post_to_slack(result_dictionary):
