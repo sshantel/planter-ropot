@@ -20,12 +20,19 @@ def connect_to_db(name):
     c = conn.cursor()
     return (c, conn)
 
-def create_csv():
+def create_listings_csv():
     with open("listings.csv", "w", newline="") as csvfile:
         csv_headers = ["id", "created", "name", "price", "location", "url", "description"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
-create_csv()
+create_listings_csv()
+
+def create_scrapings_csv():
+    with open("listings.csv", "w", newline="") as csvfile:
+        csv_headers = ["last scrape", "results scraped"]
+        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+        writer.writeheader()
+create_scrapings_csv()
 
 def create_listings_db():
     c = connect_to_db("listings.db")
@@ -42,18 +49,17 @@ def create_listings_db():
 
 create_listings_db()
 
-def craigslist_soup(region, term, parser):
-    url = "https://{region}.craigslist.org/search/sss?query={term}".format(
-        region=region, term=term
+def craigslist_soup(region, term, parser, sort):
+    url = "https://{region}.craigslist.org/search/sss?query={term}&sort=rel&{sort}=1".format(
+        region=region, term=term, sort=sort
     )
-
     response = requests.get(url=url)
     soup = b_s(response.content, parser)
 
     return soup
 
 
-c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser")
+c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser", sort="postedToday")
 
 def get_links_and_posts(input):
     posts = input.find_all("li", class_="result-row")
@@ -167,19 +173,24 @@ def insert_into_csv(result_dictionary):
 
 insert_into_csv(search_query(craigslist_soup=c_l))
 
+def 
+
+
+
 def post_to_slack(result_dictionary):
 
     client = WebClient(SLACK_TOKEN) 
-    desc = ''
-    last_scrape = '2020-09-26 17:00'
+    last_scrape = time.ctime()
+    print(last_scrape)
     for item in result_dictionary: 
-        # print(item['datetime']) 
+        print(result_dictionary)
         if last_scrape <= item['datetime']:
             print(item['datetime']) 
             desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
             response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+    last_scrape = time.ctime()
     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
-    time.sleep(60)
+    time.sleep(5000)
 
 
 post_to_slack(search_query(craigslist_soup=c_l))
