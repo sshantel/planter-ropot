@@ -171,12 +171,12 @@ def post_to_slack(result_dictionary):
 
     client = WebClient(SLACK_TOKEN) 
     desc = ''
-    last_scrape = '2020-09-26 16:00'
+    last_scrape = '2020-09-26 17:00'
     for item in result_dictionary: 
         # print(item['datetime']) 
         if last_scrape <= item['datetime']:
             print(item['datetime']) 
-            desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+            desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
             response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
     time.sleep(5000)
