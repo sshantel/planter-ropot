@@ -10,6 +10,7 @@ import csv
 import sqlite3
 
 import time
+from datetime import datetime
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
@@ -166,14 +167,43 @@ def insert_into_csv(result_dictionary):
 
 insert_into_csv(search_query(craigslist_soup=c_l))
 
-
 def post_to_slack(result_dictionary):
+
     client = WebClient(SLACK_TOKEN) 
     desc = ''
-    for item in result_dictionary:  
-        desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+    last_scrape = '2020-09-26 16:00'
+    for item in result_dictionary: 
+        # print(item['datetime']) 
+        if last_scrape <= item['datetime']:
+            print(item['datetime']) 
+            desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+            response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
+    time.sleep(5000)
 
 
 post_to_slack(search_query(craigslist_soup=c_l))
+
+
+
+# def post_to_slack(result_dictionary):
+
+#     client = WebClient(SLACK_TOKEN) 
+#     desc = ''
+#     # while True:
+#     #     time.sleep(5)
+#     with open("listings.csv") as f:
+#         cs_file = csv.reader(f)
+#         print(f'cs file is {cs_file}')
+#         for item in result_dictionary:
+#             # print(f'item is{item}')
+#             if item not in cs_file:
+#                 # print('****HELLO****')
+#                 desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+#                 response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+#             else:
+#                 print('item already in csv file')
+#     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
+
+
+# post_to_slack(search_query(craigslist_soup=c_l))
