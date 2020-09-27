@@ -179,7 +179,7 @@ def post_to_slack(result_dictionary):
             desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
             response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
-    time.sleep(5000)
+    time.sleep(60)
 
 
 post_to_slack(search_query(craigslist_soup=c_l))
