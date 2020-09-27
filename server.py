@@ -6,11 +6,13 @@ from slack import WebClient
 from bs4 import BeautifulSoup as b_s
 
 import csv
+import operator
+import pandas as pd
 
 import sqlite3
 
 import time
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
@@ -28,7 +30,7 @@ def create_listings_csv():
 create_listings_csv()
 
 def create_scrapings_csv():
-    with open("listings.csv", "w", newline="") as csvfile:
+    with open("scrapings.csv", "w", newline="") as csvfile:
         csv_headers = ["last scrape", "results scraped"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
@@ -73,6 +75,8 @@ def get_links_and_posts(input):
 
 get_links_and_posts(c_l)
 
+ 
+ 
 def search_query(craigslist_soup):
 
     links = get_links_and_posts(c_l)["links"]  
@@ -108,38 +112,20 @@ def search_query(craigslist_soup):
         else:
             neighborhood_text == "No neighborhood provided"
         result_listings = {
-            "datetime": datetime,
             "cl_id": cl_id,
+            "datetime": datetime,
             "title_text": title_text,
             "price": result_price_text,
             "neighborhood_text": neighborhood_text,
             "url": url,
             "description": planter_description,
         }
-        list_results.append(result_listings)
+        if since_last_scrape(result_listings['datetime']):
+            list_results.append(result_listings)
+        else: 
+            continue  
     return list_results 
-
-
-def insert_into_db(result_dictionary):
-    c = connect_to_db("listings.db") 
-    for item in result_dictionary:
-        c[0].execute(
-            "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?)",
-            (
-                item['cl_id'],
-                item['datetime'],
-                item['title_text'],
-                item['price'],
-                item['neighborhood_text'],
-                item['url'],
-                item['description'],
-            ),
-        )
-        c[1].commit()
-
-
-insert_into_db(search_query(craigslist_soup=c_l)) 
-
+ 
 def insert_into_csv(result_dictionary): 
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
@@ -164,34 +150,67 @@ def insert_into_csv(result_dictionary):
                     "description": item['description']
                 }
             )
-    num_rows = 0
-    for row in open("listings.csv"):
-        num_rows += 1
-    print(num_rows)
+    # num_rows = 0
+    # for row in open("listings.csv"):
+    #     num_rows += 1
+    # print(num_rows)
     csvfile.close()
+ 
 
+ 
+def since_last_scrape(datetime):
+    print(f'datetimeis {datetime}')
+    # date_time_obj = time.strptime(datetime, '%Y-%m-%d %H:%M')
+    date_time_obj = pd.to_datetime(datetime) 
+    df = pd.read_csv('listings.csv') 
+    yesterday = date.today() - timedelta(days=1)
+    print(f'yesterday is {yesterday}')
+    try: 
+        last_scrape = df['created'].max()  
+        last_scrape = pd.to_datetime(last_scrape)
+        if last_scrape == pd.isnull():
+            raise TypeError
+        # print(f'last scraaaape is {last_scrape}')
+        # last_scrape = time.strptime(last_scrape, '%Y-%m-%d %H:%M')
+    except TypeError:
+        last_scrape = yesterday  
+    return date_time_obj > last_scrape 
 
 insert_into_csv(search_query(craigslist_soup=c_l))
 
-def 
 
 
+def insert_into_db(result_dictionary):
+    c = connect_to_db("listings.db") 
+    for item in result_dictionary: 
+        c[0].execute(
+            "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?)",
+            (
+                item['cl_id'],
+                item['datetime'],
+                item['title_text'],
+                item['price'],
+                item['neighborhood_text'],
+                item['url'],
+                item['description'],
+            ),
+        )
+        c[1].commit()
 
+
+insert_into_db(search_query(craigslist_soup=c_l)) 
+ 
+
+ 
+ 
 def post_to_slack(result_dictionary):
 
-    client = WebClient(SLACK_TOKEN) 
-    last_scrape = time.ctime()
-    print(last_scrape)
-    for item in result_dictionary: 
-        print(result_dictionary)
-        if last_scrape <= item['datetime']:
-            print(item['datetime']) 
-            desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
-            response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
-    last_scrape = time.ctime()
-    print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
-    time.sleep(5000)
-
+    client = WebClient(SLACK_TOKEN)     
+    for item in result_dictionary:   
+        desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+    print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
+    time.sleep(60)
 
 post_to_slack(search_query(craigslist_soup=c_l))
 
