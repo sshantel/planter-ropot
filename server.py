@@ -17,7 +17,7 @@ from datetime import datetime, date, timedelta
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
  
- 
+
 def connect_to_db(name):
     conn = sqlite3.connect(name)
     c = conn.cursor()
@@ -211,30 +211,8 @@ def post_to_slack(result_dictionary):
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
-    time.sleep(200)
+    # time.sleep(200)
 
 post_to_slack(search_query(craigslist_soup=c_l))
 
-
-
-# def post_to_slack(result_dictionary):
-
-#     client = WebClient(SLACK_TOKEN) 
-#     desc = ''
-#     # while True:
-#     #     time.sleep(5)
-#     with open("listings.csv") as f:
-#         cs_file = csv.reader(f)
-#         print(f'cs file is {cs_file}')
-#         for item in result_dictionary:
-#             # print(f'item is{item}')
-#             if item not in cs_file:
-#                 # print('****HELLO****')
-#                 desc = f" {item['cl_id']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
-#                 response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
-#             else:
-#                 print('item already in csv file')
-#     print("{}: Got {} results".format(time.ctime(), len(result_dictionary)))
-
-
-# post_to_slack(search_query(craigslist_soup=c_l))
+ 
