@@ -17,11 +17,7 @@ from datetime import datetime, date, timedelta
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
  
-def main():
-    port = os.getenv('PORT', default=49035)
-    updater.start_webhook(port=port)
-main()
-
+ 
 def connect_to_db(name):
     conn = sqlite3.connect(name)
     c = conn.cursor()
