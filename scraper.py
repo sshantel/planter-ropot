@@ -13,6 +13,7 @@ import sqlite3
  
 import time
 from datetime import datetime, date, timedelta 
+import schedule
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
@@ -224,7 +225,6 @@ def post_to_slack(result_dictionary):
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
     time.sleep(200)
-
-post_to_slack(search_query(craigslist_soup=c_l))
+schedule.every(60).seconds.do(post_to_slack(search_query(craigslist_soup=c_l)))
 
  
