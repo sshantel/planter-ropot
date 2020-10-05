@@ -1,1 +1,1 @@
-web: python3 scraper.py 
+web: python3 scraper.py runserver 0.0.0.0:$PORT
