@@ -1,1 +1,1 @@
-web: python3 scraper.py runserver 0.0.0.0:$PORT
+web: python3 scraper.py runserver 127.0.0.1:8080
