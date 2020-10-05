@@ -26,7 +26,7 @@ def connect_to_db(name):
 
 def create_listings_csv():
     with open("listings.csv", "w", newline="") as csvfile:
-        csv_headers = ["id", "created", "name", "price", "location", "url", "description"]
+        csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
 create_listings_csv()
@@ -48,7 +48,8 @@ def create_listings_db():
                 price TEXT,
                 location TEXT NOT NULL,
                 url TEXT NOT NULL,
-                description TEXT)"""
+                description TEXT,
+                jpg TEXT)"""
     )
 
 create_listings_db()
@@ -84,15 +85,16 @@ def search_query(craigslist_soup):
     posts = get_links_and_posts(c_l)["posts"]
     posting_body = []
     list_results = [] 
+    image_jpg_list = []
     for link in links: 
         response_link = requests.get(url=link)
         link_soup = b_s(response_link.content, "html.parser")
         image_url = link_soup.find('img')
-        # print(image_url)
         if image_url is not None:
-            image_url = image_url['src']
+            image_url = image_url['src'] 
         else:
-            image_url = 'no image'
+            image_url = 'no image provided in this listing'
+        image_jpg_list.append(image_url)
         section_body_class = link_soup.find("section", id="postingbody")
         section_body_class_text = section_body_class.text
         if section_body_class_text is not None:
@@ -101,11 +103,10 @@ def search_query(craigslist_soup):
             section_body_class_text = 'No description provided'
         stripped = section_body_class_text.replace("\n\nQR Code Link to This Post\n", "")
         final_strip = stripped.replace("\n\n", "")
-        posting_body.append(final_strip)
-    print(f' *****posting body is {posting_body}')
+        posting_body.append(final_strip) 
     for index, post in enumerate(posts):
-        planter_description_full = posting_body[index]
-        planter_description = planter_description_full[:100] + '...'
+        planter_description_full = posting_body[index] 
+        image_url_jpg = image_jpg_list[index]
         result_price = post.find("span", class_="result-price")
         result_price_text = result_price.get_text()
         time_class = post.find("time", class_="result-date")
@@ -127,13 +128,14 @@ def search_query(craigslist_soup):
             "neighborhood_text": neighborhood_text,
             "url": url,
             "description": planter_description_full,
+            "jpg": image_url_jpg,
         } 
         if since_last_scrape(result_listings['datetime']):
             list_results.append(result_listings)
         else: 
             continue  
-    return list_results, image_url
- 
+    return list_results
+
 def insert_into_listings_csv(result_dictionary): 
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
@@ -144,6 +146,7 @@ def insert_into_listings_csv(result_dictionary):
             "location",
             "url",
             "description",
+            "jpg",
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         for item in result_dictionary:
@@ -155,7 +158,8 @@ def insert_into_listings_csv(result_dictionary):
                     "price": item['price'],
                     "location": item['neighborhood_text'],
                     "url": item['url'],
-                    "description": item['description']
+                    "description": item['description'],
+                    "jpg": item["jpg"]
                 }
             )
     csvfile.close()
@@ -208,7 +212,7 @@ def insert_into_db(result_dictionary):
     c = connect_to_db("listings.db") 
     for item in result_dictionary: 
         c[0].execute(
-            "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?)",
+            "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?,?)",
             (
                 item['cl_id'],
                 item['datetime'],
@@ -217,7 +221,7 @@ def insert_into_db(result_dictionary):
                 item['neighborhood_text'],
                 item['url'],
                 item['description'],
-            ),
+                item['jpg'],            ),
         )
         c[1].commit()
 
@@ -227,23 +231,15 @@ insert_into_db(search_query(craigslist_soup=c_l))
 def post_to_slack(result_dictionary):
 
     client = WebClient(SLACK_TOKEN) 
-    print(f'client is {client}')
-    # attachments = [{"image_url": image_url}]
-    # print(f'image url is {image_url}')
-    for item in result_dictionary: 
-        print(item)
-        desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
-        print(desc)
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,attachments=attachments, unfurl_links=True, unfurl_media=True )
-        print(response)
+    print(f'client is {client}') 
+    for item in result_dictionary:  
+        sliced_description = item['description']
+        sliced_description = sliced_description[:100] + '...'
+        desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}"
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc, unfurl_links=True, unfurl_media=True)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
-result_dictionary = search_query(craigslist_soup=c_l)
-# image_url = search_query(craigslist_soup[1]=c_l)
-schedule.every(1).hour.do(post_to_slack, result_dictionary) 
-
- 
-if __name__ == "__main__":
-    print('Starting scrape!')
-    while True:  
-        schedule.run_pending()  
-        time.sleep(1)  
+result_dictionary = search_query(craigslist_soup=c_l) 
+schedule.every(180).seconds.do(post_to_slack, result_dictionary) 
+while True:  
+    schedule.run_pending()  
+    time.sleep(1)  
