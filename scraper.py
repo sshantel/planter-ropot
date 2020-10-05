@@ -17,7 +17,7 @@ import schedule
 
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
- 
+
 
 def connect_to_db(name):
     conn = sqlite3.connect(name)
@@ -155,31 +155,27 @@ def insert_into_listings_csv(result_dictionary):
     csvfile.close()
 
  
-def since_last_scrape(datetime):
+def since_last_scrape(datetime): 
     print(f'datetimeis {datetime}')  
     date_time_obj = pd.to_datetime(datetime)
     print(f'date time obj is {date_time_obj}') 
     df = pd.read_csv('listings.csv') 
     print(f'df is {df}')
     yesterday = date.today() - timedelta(days=1)
-    print(f'yesterday is {yesterday}')
-    last_scrape_obj = df['created'].max()
-    print(f' last scrape obj is {last_scrape_obj}')
-    # try: 
-    #     last_scrape_obj = df['created'].max()  
-    #     print(f'last scrape is {last_scrape_obj}')
-    #     last_scrape_obj = pd.to_datetime(last_scrape_obj)
-    #     print(f'last scrape2 is {last_scrape_obj}')
-    #     if last_scrape_obj == pd.isnull():
-    #         raise TypeError
-    # except TypeError:
-    #     last_scrape_obj = yesterday  
-    return last_scrape_obj
+    print(f'yesterday is {yesterday}') 
+    try: 
+        last_scrape = df['created'].max()  
+        last_scrape = pd.to_datetime(last_scrape)
+        if last_scrape == pd.isnull():
+            raise TypeError
+    except TypeError:
+        last_scrape = yesterday  
+    return date_time_obj > last_scrape 
 
 insert_into_listings_csv(search_query(craigslist_soup=c_l))
 
-def insert_into_scrapings_csv(last_scrape_obj, result_dictionary):
-    print(f'last scrape obj is {last_scrape_obj}')
+def insert_into_scrapings_csv(last_scrape, result_dictionary):
+    print(f'last scrape is {last_scrape_obj}')
     with open("scrapings.csv", "a") as csvfile:
         fieldnames = [
             "last scrape",
@@ -188,7 +184,7 @@ def insert_into_scrapings_csv(last_scrape_obj, result_dictionary):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writerow(
             {
-                'last scrape': last_scrape_obj, 
+                'last scrape': last_scrape, 
                 'results scraped': len(result_dictionary),
             }
         )
@@ -196,8 +192,9 @@ def insert_into_scrapings_csv(last_scrape_obj, result_dictionary):
  
 
 df = pd.read_csv('listings.csv') 
-last_scrape_obj = df['created'].max() 
-
+last_scrape = df['created'].max() 
+print(f'POOP is {last_scrape}')
+last_scrape_obj = pd.to_datetime(last_scrape)
 
 insert_into_scrapings_csv(since_last_scrape(datetime = last_scrape_obj), result_dictionary = search_query(craigslist_soup=c_l))
 
@@ -221,19 +218,20 @@ def insert_into_db(result_dictionary):
 
 
 insert_into_db(search_query(craigslist_soup=c_l)) 
- 
 
-
-def post_to_slack(result_dictionary=search_query(craigslist_soup=c_l)):
+def post_to_slack(result_dictionary):
 
     client = WebClient(SLACK_TOKEN) 
-
+    print(f'client is {client}')
     for item in result_dictionary: 
+        print(item)
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
+        print(desc)
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+        print(response)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
-scheduled_to = schedule.every(280).seconds.do(post_to_slack)
-print(f'scheduled to {scheduled_to}') 
+result_dictionary = search_query(craigslist_soup=c_l)
+schedule.every(60).seconds.do(post_to_slack, result_dictionary) 
 
 while True:  
     schedule.run_pending()  
