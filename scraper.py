@@ -230,7 +230,7 @@ def post_to_slack(result_dictionary):
         print(response)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
 result_dictionary = search_query(craigslist_soup=c_l)
-schedule.every(60).seconds.do(post_to_slack, result_dictionary) 
+schedule.every(180).seconds.do(post_to_slack, result_dictionary) 
 
  
 if __name__ == "__main__":
@@ -238,6 +238,6 @@ if __name__ == "__main__":
     while True:  
         schedule.run_pending()  
         time.sleep(1) 
-    port = int(os.environ.get("PORT", 5000))
-    print('port is {port}')
-    run(host='0.0.0.0', port=port)
+    # port = int(os.environ.get("PORT", 5000))
+    # print('port is {port}')
+    # run(host='0.0.0.0', port=port)
