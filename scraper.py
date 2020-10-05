@@ -235,8 +235,8 @@ def post_to_slack(result_dictionary):
     for item in result_dictionary:  
         sliced_description = item['description']
         sliced_description = sliced_description[:100] + '...'
-        desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}"
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc, unfurl_links=True, unfurl_media=True)
+        desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
 result_dictionary = search_query(craigslist_soup=c_l) 
 schedule.every(180).seconds.do(post_to_slack, result_dictionary) 
