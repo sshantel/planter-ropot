@@ -192,8 +192,7 @@ def insert_into_scrapings_csv(last_scrape, result_dictionary):
  
 
 df = pd.read_csv('listings.csv') 
-last_scrape = df['created'].max() 
-print(f'POOP is {last_scrape}')
+last_scrape = df['created'].max()  
 last_scrape_obj = pd.to_datetime(last_scrape)
 
 insert_into_scrapings_csv(since_last_scrape(datetime = last_scrape_obj), result_dictionary = search_query(craigslist_soup=c_l))
