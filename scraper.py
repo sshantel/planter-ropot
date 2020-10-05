@@ -87,6 +87,12 @@ def search_query(craigslist_soup):
     for link in links: 
         response_link = requests.get(url=link)
         link_soup = b_s(response_link.content, "html.parser")
+        image_url = link_soup.find('img')
+        # print(image_url)
+        if image_url is not None:
+            image_url = image_url['src']
+        else:
+            image_url = 'no image'
         section_body_class = link_soup.find("section", id="postingbody")
         section_body_class_text = section_body_class.text
         if section_body_class_text is not None:
@@ -126,7 +132,7 @@ def search_query(craigslist_soup):
             list_results.append(result_listings)
         else: 
             continue  
-    return list_results 
+    return list_results, image_url
  
 def insert_into_listings_csv(result_dictionary): 
     with open("listings.csv", "a") as csvfile:
@@ -222,22 +228,22 @@ def post_to_slack(result_dictionary):
 
     client = WebClient(SLACK_TOKEN) 
     print(f'client is {client}')
+    # attachments = [{"image_url": image_url}]
+    # print(f'image url is {image_url}')
     for item in result_dictionary: 
         print(item)
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
         print(desc)
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,attachments=attachments, unfurl_links=True, unfurl_media=True )
         print(response)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
 result_dictionary = search_query(craigslist_soup=c_l)
-schedule.every(180).seconds.do(post_to_slack, result_dictionary) 
+# image_url = search_query(craigslist_soup[1]=c_l)
+schedule.every(1).hour.do(post_to_slack, result_dictionary) 
 
  
 if __name__ == "__main__":
     print('Starting scrape!')
     while True:  
         schedule.run_pending()  
-        time.sleep(1) 
-    # port = int(os.environ.get("PORT", 5000))
-    # print('port is {port}')
-    # run(host='0.0.0.0', port=port)
+        time.sleep(1)  
