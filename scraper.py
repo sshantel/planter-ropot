@@ -53,9 +53,9 @@ def create_listings_db():
 
 create_listings_db()
 
-def craigslist_soup(region, term, parser, sort):
-    url = "https://{region}.craigslist.org/search/sss?query={term}&sort=rel&{sort}=1".format(
-        region=region, term=term, sort=sort
+def craigslist_soup(region, term, parser):
+    url = "https://{region}.craigslist.org/search/sss?query={term}".format(
+        region=region, term=term
     )
     response = requests.get(url=url)
     soup = b_s(response.content, parser)
@@ -63,7 +63,7 @@ def craigslist_soup(region, term, parser, sort):
     return soup
 
 
-c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser", sort="postedToday")
+c_l = craigslist_soup(region="sfbay", term="planter", parser="html.parser")
 
 def get_links_and_posts(input):
     posts = input.find_all("li", class_="result-row")
@@ -76,7 +76,6 @@ def get_links_and_posts(input):
     return links_and_posts
 
 get_links_and_posts(c_l)
-
  
  
 def search_query(craigslist_soup):
@@ -91,7 +90,7 @@ def search_query(craigslist_soup):
         section_body_class = link_soup.find("section", id="postingbody")
         section_body_class_text = section_body_class.text
         if section_body_class_text is not None:
-            section_body_class_text = section_body_class.text
+            section_body_class_text = section_body_class.get_text()
         else:
             section_body_class_text = 'No description provided'
         stripped = section_body_class_text.replace("\n\nQR Code Link to This Post\n", "")
@@ -99,7 +98,8 @@ def search_query(craigslist_soup):
         posting_body.append(final_strip)
     print(f' *****posting body is {posting_body}')
     for index, post in enumerate(posts):
-        planter_description = posting_body[index]
+        planter_description_full = posting_body[index]
+        planter_description = planter_description_full[:100] + '...'
         result_price = post.find("span", class_="result-price")
         result_price_text = result_price.get_text()
         time_class = post.find("time", class_="result-date")
@@ -120,8 +120,8 @@ def search_query(craigslist_soup):
             "price": result_price_text,
             "neighborhood_text": neighborhood_text,
             "url": url,
-            "description": planter_description,
-        }
+            "description": planter_description_full,
+        } 
         if since_last_scrape(result_listings['datetime']):
             list_results.append(result_listings)
         else: 
@@ -153,44 +153,53 @@ def insert_into_listings_csv(result_dictionary):
                 }
             )
     csvfile.close()
- 
 
  
 def since_last_scrape(datetime):
-    print(f'datetimeis {datetime}') 
-    results_scraped = []
-    date_time_obj = pd.to_datetime(datetime) 
+    print(f'datetimeis {datetime}')  
+    date_time_obj = pd.to_datetime(datetime)
+    print(f'date time obj is {date_time_obj}') 
     df = pd.read_csv('listings.csv') 
+    print(f'df is {df}')
     yesterday = date.today() - timedelta(days=1)
     print(f'yesterday is {yesterday}')
-    try: 
-        last_scrape = df['created'].max()  
-        last_scrape = pd.to_datetime(last_scrape)
-        if last_scrape == pd.isnull():
-            raise TypeError
-    except TypeError:
-        last_scrape = yesterday  
-    return date_time_obj > last_scrape 
+    last_scrape_obj = df['created'].max()
+    print(f' last scrape obj is {last_scrape_obj}')
+    # try: 
+    #     last_scrape_obj = df['created'].max()  
+    #     print(f'last scrape is {last_scrape_obj}')
+    #     last_scrape_obj = pd.to_datetime(last_scrape_obj)
+    #     print(f'last scrape2 is {last_scrape_obj}')
+    #     if last_scrape_obj == pd.isnull():
+    #         raise TypeError
+    # except TypeError:
+    #     last_scrape_obj = yesterday  
+    return last_scrape_obj
 
 insert_into_listings_csv(search_query(craigslist_soup=c_l))
 
-# def insert_into_scrapings_csv(last_scrape):
-#     print(f'last scrape is {last_scrape}')
-#     with open("scrapings.csv", "a") as csvfile:
-#         fieldnames = [
-#             "last scrape",
-#             "results scraped", 
-#         ]
-#         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-#         for item in result_dictionary:
-#             writer.writerow(
-#                 {
-#                      'last scrape': last_scrape,  
-#                 }
-#             )
-#     csvfile.close()
+def insert_into_scrapings_csv(last_scrape_obj, result_dictionary):
+    print(f'last scrape obj is {last_scrape_obj}')
+    with open("scrapings.csv", "a") as csvfile:
+        fieldnames = [
+            "last scrape",
+            "results scraped", 
+        ]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writerow(
+            {
+                'last scrape': last_scrape_obj, 
+                'results scraped': len(result_dictionary),
+            }
+        )
+    csvfile.close()
+ 
 
-# insert_into_scrapings_csv(since_last_scrape(datetime))
+df = pd.read_csv('listings.csv') 
+last_scrape_obj = df['created'].max() 
+
+
+insert_into_scrapings_csv(since_last_scrape(datetime = last_scrape_obj), result_dictionary = search_query(craigslist_soup=c_l))
 
 
 def insert_into_db(result_dictionary):
@@ -214,9 +223,8 @@ def insert_into_db(result_dictionary):
 insert_into_db(search_query(craigslist_soup=c_l)) 
  
 
- 
- 
-def post_to_slack(result_dictionary):
+
+def post_to_slack(result_dictionary=search_query(craigslist_soup=c_l)):
 
     client = WebClient(SLACK_TOKEN) 
 
@@ -224,7 +232,10 @@ def post_to_slack(result_dictionary):
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {item['description']}"
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc,)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_dictionary)))
-    time.sleep(200)
-schedule.every(60).seconds.do(post_to_slack(search_query(craigslist_soup=c_l)))
+scheduled_to = schedule.every(280).seconds.do(post_to_slack)
+print(f'scheduled to {scheduled_to}') 
 
+while True:  
+    schedule.run_pending()  
+    time.sleep(1)
  
