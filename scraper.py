@@ -237,5 +237,5 @@ if __name__ == "__main__":
     while True:  
         schedule.run_pending()  
         time.sleep(1) 
-post_to_slack(host='0.0.0.0', debug=True, port=80)
+# post_to_slack(host='0.0.0.0', debug=True, port=3000)
  
