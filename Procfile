@@ -1,1 +1,1 @@
-worker: python3 scraper.py --bind 0.0.0.0:5000
+worker: python3 scraper.py 
