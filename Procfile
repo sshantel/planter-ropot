@@ -1,1 +1,1 @@
-web: python3 scraper.py  
+web: python3 scraper.py --bind 0.0.0.0:5000
