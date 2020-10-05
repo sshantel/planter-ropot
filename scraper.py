@@ -234,8 +234,9 @@ schedule.every(60).seconds.do(post_to_slack, result_dictionary)
 
  
 if __name__ == "__main__":
+    print('Starting scrape!')
     while True:  
         schedule.run_pending()  
         time.sleep(1) 
-post_to_slack(host='127.0.0.1', debug=True, port=8080)
+post_to_slack(host='0.0.0.0', debug=True, port=8080)
  
