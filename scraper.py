@@ -248,7 +248,6 @@ list_results = search_query(craigslist_soup=c_l)
 schedule.every(900).seconds.do(post_to_slack, list_results) 
 
 if __name__ == "__main__":
-    list_results = search_query(craigslist_soup=c_l) 
     while True:
         print("Starting scrape cycle of planters: {}".format(time.ctime()))
         try:
@@ -264,4 +263,4 @@ if __name__ == "__main__":
             print(in_fifteen)
             print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_fifteen)) 
         schedule.run_pending()
-        time.sleep(60) 
+        time.sleep(900) 
