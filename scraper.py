@@ -136,7 +136,6 @@ def search_query(craigslist_soup):
             list_results.append(result_listings)
         else: 
             continue
-    print(f' list results are {list_results}')  
     return list_results
 
 def insert_into_listings_csv(result_dictionary): 
@@ -165,12 +164,11 @@ def insert_into_listings_csv(result_dictionary):
                     "jpg": item["jpg"]
                 }
             )
-    print(f'result dictionary is {result_dictionary}')
     csvfile.close()
 
  
 def since_last_scrape(time): 
-    print(f'datetimeis {time}')  
+    print(f'timeis {time}')  
     date_time_obj = pd.to_datetime(time)
     print(f'date time obj is {date_time_obj}') 
     df = pd.read_csv('listings.csv') 
@@ -178,7 +176,7 @@ def since_last_scrape(time):
     yesterday = date.today() - timedelta(days=1)
     print(f'yesterday is {yesterday}') 
     fifteen_minutes_ago = datetime.now() - timedelta(minutes=15)
-    print(f'forty minutes ago is {fifteen_minutes_ago}')
+    print(f'fifteen minutes ago is {fifteen_minutes_ago}')
     try: 
         last_scrape = df['created'].max() 
         print(f'last scrape ONE is {last_scrape}') 
@@ -246,13 +244,13 @@ def post_to_slack(list_results):
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
     print("End scrape {}: Got {} results".format(datetime.now(), len(list_results)))
-# list_results = search_query(craigslist_soup=c_l) 
-# schedule.every(60).seconds.do(post_to_slack, list_results) 
+list_results = search_query(craigslist_soup=c_l) 
+schedule.every(900).seconds.do(post_to_slack, list_results) 
 
 if __name__ == "__main__":
     list_results = search_query(craigslist_soup=c_l) 
     while True:
-        print("{}: Starting scrape cycle of planters".format(time.ctime()))
+        print("Starting scrape cycle of planters: {}".format(time.ctime()))
         try:
             post_to_slack(list_results)
         except KeyboardInterrupt:
@@ -262,6 +260,8 @@ if __name__ == "__main__":
             print("Error with the scraping:", sys.exc_info()[0])
             traceback.print_exc()
         else:
-            print("{}: Successfully finished scraping".format(time.ctime()))
+            in_fifteen = datetime.now() + timedelta(minutes=15)
+            print(in_fifteen)
+            print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_fifteen)) 
         schedule.run_pending()
-        time.sleep(600) 
+        time.sleep(60) 
