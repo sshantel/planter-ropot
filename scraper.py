@@ -169,14 +169,16 @@ def insert_into_listings_csv(result_dictionary):
     csvfile.close()
 
  
-def since_last_scrape(datetime): 
-    print(f'datetimeis {datetime}')  
-    date_time_obj = pd.to_datetime(datetime)
+def since_last_scrape(time): 
+    print(f'datetimeis {time}')  
+    date_time_obj = pd.to_datetime(time)
     print(f'date time obj is {date_time_obj}') 
     df = pd.read_csv('listings.csv') 
     print(f'df is {df}')
     yesterday = date.today() - timedelta(days=1)
     print(f'yesterday is {yesterday}') 
+    fifteen_minutes_ago = datetime.now() - timedelta(minutes=15)
+    print(f'forty minutes ago is {fifteen_minutes_ago}')
     try: 
         last_scrape = df['created'].max() 
         print(f'last scrape ONE is {last_scrape}') 
@@ -185,7 +187,7 @@ def since_last_scrape(datetime):
         if last_scrape_obj == pd.isnull():
             raise TypeError
     except TypeError:
-        last_scrape_obj = yesterday  
+        last_scrape_obj = fifteen_minutes_ago
     return date_time_obj > last_scrape_obj
 
 insert_into_listings_csv(search_query(craigslist_soup=c_l))
@@ -212,7 +214,7 @@ df = pd.read_csv('listings.csv')
 last_scrape = df['created'].max()  
 last_scrape = pd.to_datetime(last_scrape)
 
-insert_into_scrapings_csv(since_last_scrape(datetime = last_scrape), result_dictionary = search_query(craigslist_soup=c_l))
+insert_into_scrapings_csv(since_last_scrape(time = last_scrape), result_dictionary = search_query(craigslist_soup=c_l))
 
 
 def insert_into_db(result_dictionary):
@@ -243,10 +245,9 @@ def post_to_slack(list_results):
         sliced_description = sliced_description[:100] + '...'
         desc = f" {item['cl_id']} | {item['price']} | {item['datetime']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
-        posted_to_slack.append(response)
     print("End scrape {}: Got {} results".format(datetime.now(), len(list_results)))
-list_results = search_query(craigslist_soup=c_l) 
-schedule.every(20).minutes.do(post_to_slack, list_results) 
+# list_results = search_query(craigslist_soup=c_l) 
+# schedule.every(60).seconds.do(post_to_slack, list_results) 
 
 if __name__ == "__main__":
     list_results = search_query(craigslist_soup=c_l) 
@@ -262,4 +263,5 @@ if __name__ == "__main__":
             traceback.print_exc()
         else:
             print("{}: Successfully finished scraping".format(time.ctime()))
-time.sleep(1) 
+        schedule.run_pending()
+        time.sleep(600) 
