@@ -167,16 +167,42 @@ def insert_into_listings_csv(result_dictionary):
     csvfile.close()
 
  
-def since_last_scrape(time): 
-    print(f'timeis {time}')  
-    date_time_obj = pd.to_datetime(time)
+def since_last_scrape(time_input): 
+    month_dict = {"Jan": '01', "Feb": '02', "Mar": '03', "Apr": '04', "May": '05', "Jun": '06', "Jul": '07', "Aug": '08', "Sep": '09', "Oct":'10', "Nov":'11', "Dec":'12'}
+    print(f'time is {time_input}')  
+    date_time_obj = pd.to_datetime(time_input)
     print(f'date time obj is {date_time_obj}') 
     df = pd.read_csv('listings.csv') 
-    print(f'df is {df}')
-    yesterday = date.today() - timedelta(days=1)
-    print(f'yesterday is {yesterday}') 
-    fifteen_minutes_ago = datetime.now() - timedelta(minutes=15)
-    print(f'fifteen minutes ago is {fifteen_minutes_ago}')
+    print(f'df is {df}') 
+    time_now = time.ctime()
+    print(f'time now is {time_now}') 
+    reconstructed_time_listing = ''
+    split_time_now = time_now.split()
+    day_of_listing = split_time_now[0]
+    month_of_listing = split_time_now[1]
+    number_day = split_time_now[2]
+    timestamp_listing = split_time_now[3]
+    year_of_listing  = split_time_now[4]
+    reconstructed_time_listing += year_of_listing 
+    reconstructed_time_listing += '-'
+    reconstructed_time_listing += month_dict[month_of_listing]
+    reconstructed_time_listing += '-'
+    if len(day_of_listing) == 2:
+        reconstructed_time_listing += number_day
+    else:
+        reconstructed_time_listing += '0' + number_day
+    reconstructed_time_listing += ' '
+    poop = timestamp_listing[:2]
+    poop_minus_one = int(poop) - 1
+    print(poop_minus_one)
+    poop_minus_one_string = str(poop_minus_one)
+    reconstructed_time_listing += poop_minus_one_string
+    reconstructed_time_listing += timestamp_listing[2:8] 
+    print(reconstructed_time_listing)
+    reconstructed_time_listing_obj = pd.to_datetime(reconstructed_time_listing)
+    print(reconstructed_time_listing_obj)
+    # time_fifteen_minutes_ago = time_now - timedelta(minutes=15)
+    # print(time_fifteen_minutes_ago)
     try: 
         last_scrape = df['created'].max() 
         print(f'last scrape ONE is {last_scrape}') 
@@ -185,7 +211,7 @@ def since_last_scrape(time):
         if last_scrape_obj == pd.isnull():
             raise TypeError
     except TypeError:
-        last_scrape_obj = fifteen_minutes_ago
+        last_scrape_obj = reconstructed_time_listing_obj
     return date_time_obj > last_scrape_obj
 
 insert_into_listings_csv(search_query(craigslist_soup=c_l))
@@ -212,7 +238,7 @@ df = pd.read_csv('listings.csv')
 last_scrape = df['created'].max()  
 last_scrape = pd.to_datetime(last_scrape)
 
-insert_into_scrapings_csv(since_last_scrape(time = last_scrape), result_dictionary = search_query(craigslist_soup=c_l))
+insert_into_scrapings_csv(since_last_scrape(time_input = last_scrape), result_dictionary = search_query(craigslist_soup=c_l))
 
 
 def insert_into_db(result_dictionary):
@@ -245,13 +271,16 @@ def post_to_slack(list_results):
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
     print("End scrape {}: Got {} results".format(datetime.now(), len(list_results)))
 list_results = search_query(craigslist_soup=c_l) 
-schedule.every(900).seconds.do(post_to_slack, list_results) 
+schedule.every(1).hour.do(post_to_slack, list_results) 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     while True:
-        print("Starting scrape cycle of planters: {}".format(time.ctime()))
+        print("Starting scrape cycle of free things in the SF Bay Area: {}".format(time.ctime()))
         try:
-            post_to_slack(list_results)
+            list_results = search_query(craigslist_soup=c_l) 
+            # schedule.every(900).seconds.do(post_to_slack, list_results) 
+            post_to_slack(list_results) 
+
         except KeyboardInterrupt:
             print("Exiting....")
             sys.exit(1)
@@ -259,8 +288,8 @@ if __name__ == "__main__":
             print("Error with the scraping:", sys.exc_info()[0])
             traceback.print_exc()
         else:
-            in_fifteen = datetime.now() + timedelta(minutes=15)
-            print(in_fifteen)
-            print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_fifteen)) 
+            in_one_hour = datetime.now() + timedelta(hours=1)
+            print(in_one_hour)
+            print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_one_hour)) 
         schedule.run_pending()
-        time.sleep(900) 
+        time.sleep(3600) 
