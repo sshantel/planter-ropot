@@ -8,7 +8,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 
 <b> Installation </b>
 
-<i>You must have the following installed to run Eureka: </i>
+<i>You must have the following installed to run Craigslist-Ropot: </i>
  
 <br>
 API key for Slack 
