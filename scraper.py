@@ -99,12 +99,12 @@ def search_query(craigslist_soup):
         image_jpg_list.append(image_url)
         section_body_class = link_soup.find("section", id="postingbody")
         print(f'section body class is {section_body_class}')
-        section_body_class_text = section_body_class.text
-        if section_body_class_text is not None:
-            section_body_class_text = section_body_class.get_text()
+        # section_body_class_text = section_body_class.text
+        if section_body_class is not None:
+            section_body_class = section_body_class.get_text()
         else:
-            section_body_class_text = 'No description provided'
-        stripped = section_body_class_text.replace("\n\nQR Code Link to This Post\n", "")
+            section_body_class = 'No description provided'
+        stripped = section_body_class.replace("\n\nQR Code Link to This Post\n", "")
         final_strip = stripped.replace("\n\n", "")
         posting_body.append(final_strip) 
     for index, post in enumerate(posts):
