@@ -98,6 +98,7 @@ def search_query(craigslist_soup):
             image_url = 'no image provided in this listing'
         image_jpg_list.append(image_url)
         section_body_class = link_soup.find("section", id="postingbody")
+        print(f'section body class is {section_body_class}')
         section_body_class_text = section_body_class.text
         if section_body_class_text is not None:
             section_body_class_text = section_body_class.get_text()
