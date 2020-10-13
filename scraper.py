@@ -98,8 +98,6 @@ def search_query(craigslist_soup):
             image_url = 'no image provided in this listing'
         image_jpg_list.append(image_url)
         section_body_class = link_soup.find("section", id="postingbody")
-        print(f'section body class is {section_body_class}')
-        # section_body_class_text = section_body_class.text
         if section_body_class is not None:
             section_body_class = section_body_class.get_text()
         else:
@@ -120,7 +118,7 @@ def search_query(craigslist_soup):
         title_text = title_class.text
         neighborhood = post.find("span", class_="result-hood")
         if neighborhood is not None:
-            neighborhood_text = neighborhood.text
+            neighborhood_text = neighborhood.get_text()
         else:
             neighborhood_text == "No neighborhood provided"
         result_listings = {
@@ -169,7 +167,6 @@ def insert_into_listings_csv(result_dictionary):
 
  
 def since_last_scrape(time_input): 
-    # month_dict = {"Jan": '01', "Feb": '02', "Mar": '03', "Apr": '04', "May": '05', "Jun": '06', "Jul": '07', "Aug": '08', "Sep": '09', "Oct":'10', "Nov":'11', "Dec":'12'}
     print(f'time input is {time_input}')  
     date_time_obj = pd.to_datetime(time_input)
     print(f'date time obj is {date_time_obj}') 
@@ -177,44 +174,11 @@ def since_last_scrape(time_input):
     print(f'df is {df}') 
     time_now = time.ctime()
     print(f'time now is {time_now}') 
-    # reconstructed_time_listing = ''
-    # split_time_now = time_now.split()
-    # day_of_listing = split_time_now[0]
-    # month_of_listing = split_time_now[1]
-    # number_day = split_time_now[2]
-    # timestamp_listing = split_time_now[3]
-    # year_of_listing  = split_time_now[4]
-    # reconstructed_time_listing += year_of_listing 
-    # reconstructed_time_listing += '-'
-    # reconstructed_time_listing += month_dict[month_of_listing]
-    # reconstructed_time_listing += '-'
-    # if len(day_of_listing) == 2:
-    #     reconstructed_time_listing += number_day
-    # else:
-    #     reconstructed_time_listing += '0' + number_day
-    # reconstructed_time_listing += ' '
-    # poop = timestamp_listing[:2]
-    # poop_minus_one = int(poop) - 1
-    # print(poop_minus_one)
-    # poop_minus_one_string = str(poop_minus_one)
-    # reconstructed_time_listing += poop_minus_one_string
-    # reconstructed_time_listing += timestamp_listing[2:8] 
-    # print(reconstructed_time_listing)
-    # reconstructed_time_listing_obj = pd.to_datetime(reconstructed_time_listing)
-    # print(reconstructed_time_listing_obj)
-    time_fifteen_minutes_ago = datetime.now() - timedelta(hours=2)
-    print(time_fifteen_minutes_ago)
+    time_two_hours_ago = datetime.now() - timedelta(hours=2)
+    print(time_two_hours_ago)
     last_scrape = df['created'].max()
     last_scrape_obj = pd.to_datetime(last_scrape)
-    # try: 
-    #     last_scrape = df['created'].max() 
-    #     print(f'last scrape ONE is {last_scrape}') 
-    #     last_scrape_obj = pd.to_datetime(last_scrape)
-    #     print(f'last scrape OBJ is {last_scrape_obj}')
-    #     if last_scrape_obj == pd.isnull():
-    #         raise TypeError
-    # except TypeError:
-    last_scrape_obj = time_fifteen_minutes_ago
+    last_scrape_obj = time_two_hours_ago
     return date_time_obj > last_scrape_obj
 
 
@@ -276,10 +240,9 @@ schedule.every(1).hour.do(post_to_slack, list_results)
 
 if __name__ == "__main__": 
     while True:
-        print("Starting scrape cycle of free things in the SF Bay Area: {}".format(time.ctime()))
+        print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
-            list_results = search_query(craigslist_soup=c_l) 
-            # schedule.every(900).seconds.do(post_to_slack, list_results) 
+            list_results = search_query(craigslist_soup=c_l)  
             post_to_slack(list_results) 
 
         except KeyboardInterrupt:
