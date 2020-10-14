@@ -229,4 +229,4 @@ if __name__ == "__main__":
             print(in_one_hour)
             print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_one_hour)) 
         schedule.run_pending()
-        time.sleep(600) 
+        time.sleep(2400) 
