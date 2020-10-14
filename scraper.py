@@ -15,51 +15,30 @@ import traceback
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
 
-def get_last_scrape(): 
-    with open("scrapings.csv", newline='') as csvfile:
-        last_scrape = '' 
-        df = pd.read_csv('listings.csv') 
-        print(f'df is {df}') 
-        if not df.empty:  
-            print(f'df is {df}')
-            last_scrape = df['created'].max()  
-            last_scrape = pd.to_datetime(last_scrape)
-        else:
-            last_scrape = datetime.now() - timedelta(hours=2)  
-        print(f'FIRST CALL last_scrape is {last_scrape}')
-        return last_scrape
-
-get_last_scrape()
 
 def connect_to_db(name_of_db):
     conn = sqlite3.connect(name_of_db)
     c = conn.cursor()
     return (c, conn)
 
-def create_csv_db():
-    with open("listings.csv", "w", newline="") as csvfile:
-        csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
-        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-        writer.writeheader()
-    with open("scrapings.csv", "w", newline="") as csvfile:
-        csv_headers = ["last scrape", "results scraped"]
-        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-        writer.writeheader()
-    c = connect_to_db("listings.db")
-    c[0].execute(
-        """CREATE TABLE IF NOT EXISTS listings
-                (id TEXT PRIMARY KEY,
-                created TEXT,
-                name TEXT,
-                price TEXT,
-                location TEXT,
-                url TEXT UNIQUE,
-                description TEXT,
-                jpg TEXT)"""
-    )
-create_csv_db()
+def get_last_scrape(): 
+    with open("listings.csv", newline='') as csvfile:
+        last_scrape = '' 
+        df = pd.read_csv('listings.csv') 
+        print(f'df is {df}') 
+        if not df.empty:   
+            last_scrape = df['created'].max()  
+            last_scrape = pd.to_datetime(last_scrape)
+        else:
+            last_scrape = datetime.now() - timedelta(hours=2)  
+        print(f'FIRST CALL last_scrape is {last_scrape}')
 
-def craigslist_soup(region, term,last_scrape):
+    return last_scrape
+
+get_last_scrape()
+
+def craigslist_soup(region, term, last_scrape):
+    print(f'craigslist soup {last_scrape}')
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
         region=region, term=term
     )
@@ -127,9 +106,33 @@ def craigslist_soup(region, term,last_scrape):
     print(f'last SCRAPE is {last_scrape}')
     return list_results 
 
-craigslist_soup('sfbay','planter', last_scrape=get_last_scrape())
+craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
 
-c_l = craigslist_soup(region = 'sfbay', term='planter',last_scrape=get_last_scrape())
+c_l = craigslist_soup(region='sfbay', term='planter',last_scrape=get_last_scrape())
+
+
+def create_csv_db():
+    with open("listings.csv", "w", newline="") as csvfile:
+        csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
+        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+        writer.writeheader()
+    with open("scrapings.csv", "w", newline="") as csvfile:
+        csv_headers = ["last scrape", "results scraped"]
+        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+        writer.writeheader()
+    c = connect_to_db("listings.db")
+    c[0].execute(
+        """CREATE TABLE IF NOT EXISTS listings
+                (id TEXT PRIMARY KEY,
+                created TEXT,
+                name TEXT,
+                price TEXT,
+                location TEXT,
+                url TEXT UNIQUE,
+                description TEXT,
+                jpg TEXT)"""
+    )
+create_csv_db()
 
 def insert_into_csv_db(result_listings, last_scrape): 
     #add to listings csv 
@@ -159,7 +162,8 @@ def insert_into_csv_db(result_listings, last_scrape):
                 }
             )
     csvfile.close()
-    #add to scrapings csv
+    #add to scrapings csv 
+
     with open("scrapings.csv", "a") as csvfile:
         fieldnames = [
             "last scrape",
@@ -173,10 +177,6 @@ def insert_into_csv_db(result_listings, last_scrape):
             }
         ) 
     csvfile.close()
-
-    df = pd.read_csv('listings.csv') 
-    last_scrape = df['created'].max()  
-    last_scrape = pd.to_datetime(last_scrape)
 
     c = connect_to_db("listings.db") 
     for item in result_listings:   
@@ -193,6 +193,7 @@ def insert_into_csv_db(result_listings, last_scrape):
                 item['jpg'],            ),
         )
         c[1].commit()
+
 insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
 
 def post_to_slack(result_listings):
@@ -212,11 +213,11 @@ if __name__ == "__main__":
     while True:
         print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
+            connect_to_db('listings.db')
             get_last_scrape()
+            craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
             create_csv_db()
-            craigslist_soup('sfbay','planter', last_scrape=get_last_scrape())
             insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
-            result_listings = c_l
             post_to_slack(result_listings) 
         except KeyboardInterrupt:
             print("Exiting....")
