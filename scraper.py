@@ -17,20 +17,15 @@ SLACK_CHANNEL = "#planter_ropot"
 
 def get_last_scrape(): 
     with open("scrapings.csv", newline='') as csvfile:
-        last_scrape = ''
-        reader = csv.DictReader(csvfile)
+        last_scrape = '' 
         df = pd.read_csv('listings.csv') 
-        print(f'df is {df}')
-        print(reader)
-        # for row in reader:
-        #     print(row) 
-        if not df.empty:
-            df = pd.read_csv('listings.csv') 
+        print(f'df is {df}') 
+        if not df.empty:  
             print(f'df is {df}')
             last_scrape = df['created'].max()  
             last_scrape = pd.to_datetime(last_scrape)
         else:
-            last_scrape = datetime.now() - timedelta(hours=3)  
+            last_scrape = datetime.now() - timedelta(hours=2)  
         print(f'last_scrape is{last_scrape}')
         return last_scrape
 
@@ -122,24 +117,24 @@ def craigslist_soup(region, term):
             "description": planter_description_full,
             "jpg": image_url_jpg,
         } 
-        df = pd.read_csv('listings.csv') 
-        print(f'df is {df}')
-                
+        df = pd.read_csv('listings.csv')  
         if not df.empty:
             last_scrape = df['created'].max()  
             last_scrape = pd.to_datetime(last_scrape)
         else:
-            last_scrape = datetime.now() - timedelta(hours=3) 
-    # last_scrape = datetime.now() - timedelta(hours=2)
-        if pd.to_datetime(result_listings['created_at']) > last_scrape:
+            last_scrape = datetime.now() - timedelta(hours=3)  
+
+        if pd.to_datetime(result_listings['created_at']) > pd.to_datetime(last_scrape):
             list_results.append(result_listings)
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
         else:  
             print(f'the listing was posted at {created_at} and the last scrapetime was so we will NOT append this')
-    # print(list_results)
+    print(list_results)
     return list_results, last_scrape
 
 craigslist_soup('sfbay','planter')
+
+c_l = craigslist_soup(region = 'sfbay', term='planter')
 
 def insert_into_csv_db(result_listings, last_scrape): 
     #add to listings csv 
@@ -201,25 +196,26 @@ def insert_into_csv_db(result_listings, last_scrape):
                 item['jpg'],            ),
         )
         c[1].commit()
-insert_into_csv_db(last_scrape=craigslist_soup(region='sfbay',term='planter')[1], result_listings=craigslist_soup(region='sfbay',term='planter')[0])
+insert_into_csv_db(result_listings=c_l[0], last_scrape=c_l[1])
 
 def post_to_slack(result_listings):
     client = WebClient(SLACK_TOKEN) 
     print(f'client is {client}')  
+    print(f'slack result listings {result_listings}')
     for item in result_listings:     
         sliced_description = item['description']
         sliced_description = sliced_description[:100] + '...'
         desc = f" {item['cl_id']} | {item['price']} | {item['created_at']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
-result_listings=result_listings=craigslist_soup(region='sfbay',term='planter')[0]
+result_listings= c_l[0]
 schedule.every(1).hour.do(post_to_slack, result_listings) 
 
 if __name__ == "__main__": 
     while True:
         print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
-            result_listings = craigslist_soup(region='sfbay',term='planter')[0] 
+            result_listings = c_l[0] 
             post_to_slack(result_listings) 
         except KeyboardInterrupt:
             print("Exiting....")
