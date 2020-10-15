@@ -117,10 +117,7 @@ def create_csv_db():
         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
-    # with open("scrapings.csv", "w", newline="") as csvfile:
-    #     csv_headers = ["last scrape", "results scraped"]
-    #     writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-    #     writer.writeheader()
+
     c = connect_to_db("listings.db")
     c[0].execute(
         """CREATE TABLE IF NOT EXISTS listings
@@ -163,21 +160,6 @@ def insert_into_csv_db(result_listings, last_scrape):
                 }
             )
     csvfile.close()
-    #add to scrapings csv 
-
-    # with open("scrapings.csv", "a") as csvfile:
-    #     fieldnames = [
-    #         "last scrape",
-    #         "results scraped", 
-    #     ]
-    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    #     writer.writerow(
-    #         {
-    #             'last scrape': last_scrape, 
-    #             'results scraped': len(result_listings),
-    #         }
-    #     ) 
-    # csvfile.close()
 
     c = connect_to_db("listings.db") 
     for item in result_listings:   
