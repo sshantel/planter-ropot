@@ -28,9 +28,7 @@ def get_last_scrape():
         print(f'df is {df}') 
         if not df.empty:   
             last_scrape = df['created'].max()  
-            last_scrape = pd.to_datetime(last_scrape)
-        else:
-            last_scrape = datetime.now() - timedelta(hours=2)  
+            last_scrape = pd.to_datetime(last_scrape) 
         print(f'FIRST CALL last_scrape is {last_scrape}')
 
     return last_scrape
@@ -97,7 +95,10 @@ def craigslist_soup(region, term, last_scrape):
             "jpg": image_url_jpg,
         }  
 
-        if pd.to_datetime(result_listings['created_at']) > pd.to_datetime(last_scrape):
+        if pd.isnull(pd.to_datetime(last_scrape)):
+            list_results.append(result_listings)
+            print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
+        elif pd.to_datetime(result_listings['created_at']) > (pd.to_datetime(last_scrape)):
             list_results.append(result_listings)
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
         else:  
@@ -116,10 +117,10 @@ def create_csv_db():
         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
-    with open("scrapings.csv", "w", newline="") as csvfile:
-        csv_headers = ["last scrape", "results scraped"]
-        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-        writer.writeheader()
+    # with open("scrapings.csv", "w", newline="") as csvfile:
+    #     csv_headers = ["last scrape", "results scraped"]
+    #     writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+    #     writer.writeheader()
     c = connect_to_db("listings.db")
     c[0].execute(
         """CREATE TABLE IF NOT EXISTS listings
@@ -164,19 +165,19 @@ def insert_into_csv_db(result_listings, last_scrape):
     csvfile.close()
     #add to scrapings csv 
 
-    with open("scrapings.csv", "a") as csvfile:
-        fieldnames = [
-            "last scrape",
-            "results scraped", 
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writerow(
-            {
-                'last scrape': last_scrape, 
-                'results scraped': len(result_listings),
-            }
-        ) 
-    csvfile.close()
+    # with open("scrapings.csv", "a") as csvfile:
+    #     fieldnames = [
+    #         "last scrape",
+    #         "results scraped", 
+    #     ]
+    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    #     writer.writerow(
+    #         {
+    #             'last scrape': last_scrape, 
+    #             'results scraped': len(result_listings),
+    #         }
+    #     ) 
+    # csvfile.close()
 
     c = connect_to_db("listings.db") 
     for item in result_listings:   
