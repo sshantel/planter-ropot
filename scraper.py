@@ -1,11 +1,14 @@
 import requests
 import os
+
 from slack import WebClient
 from bs4 import BeautifulSoup as b_s
+
 import csv
 import operator
 import pandas as pd
 import sqlite3
+
 import time
 from datetime import datetime, date, timedelta 
 import schedule
@@ -15,11 +18,30 @@ import traceback
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
 
-
 def connect_to_db(name_of_db):
-    conn = sqlite3.connect(name_of_db)
+    conn = sqlite3.connect('listings.db')
     c = conn.cursor()
     return (c, conn)
+
+# def create_csv_db():
+#     with open("listings.csv", "w", newline="") as csvfile:
+#         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
+#         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+#         writer.writeheader()
+
+#     c = connect_to_db("listings.db")
+#     c[0].execute(
+#         """CREATE TABLE IF NOT EXISTS listings
+#                 (id TEXT PRIMARY KEY,
+#                 created TEXT,
+#                 name TEXT,
+#                 price TEXT,
+#                 location TEXT,
+#                 url TEXT UNIQUE,
+#                 description TEXT,
+#                 jpg TEXT)"""
+#     )
+# create_csv_db()
 
 def get_last_scrape(): 
     with open("listings.csv", newline='') as csvfile:
@@ -111,27 +133,6 @@ craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
 
 c_l = craigslist_soup(region='sfbay', term='planter',last_scrape=get_last_scrape())
 
-
-def create_csv_db():
-    with open("listings.csv", "w", newline="") as csvfile:
-        csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
-        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-        writer.writeheader()
-
-    c = connect_to_db("listings.db")
-    c[0].execute(
-        """CREATE TABLE IF NOT EXISTS listings
-                (id TEXT PRIMARY KEY,
-                created TEXT,
-                name TEXT,
-                price TEXT,
-                location TEXT,
-                url TEXT UNIQUE,
-                description TEXT,
-                jpg TEXT)"""
-    )
-create_csv_db()
-
 def insert_into_csv_db(result_listings, last_scrape): 
     #add to listings csv 
     with open("listings.csv", "a") as csvfile:
@@ -176,8 +177,10 @@ def insert_into_csv_db(result_listings, last_scrape):
                 item['jpg'],            ),
         )
         c[1].commit()
-
 insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
+
+
+ 
 
 def post_to_slack(result_listings):
     client = WebClient(SLACK_TOKEN) 
@@ -199,7 +202,7 @@ if __name__ == "__main__":
             connect_to_db('listings.db')
             get_last_scrape()
             craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
-            create_csv_db()
+            # create_csv_db()
             insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
             post_to_slack(result_listings) 
         except KeyboardInterrupt:
