@@ -18,11 +18,6 @@ import traceback
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
 
-def connect_to_db(name_of_db):
-    conn = sqlite3.connect('listings.db')
-    c = conn.cursor()
-    return (c, conn)
-
 # def create_csv_db():
 #     with open("listings.csv", "w", newline="") as csvfile:
 #         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
@@ -30,6 +25,26 @@ def connect_to_db(name_of_db):
 #         writer.writeheader()
 # create_csv_db()
 
+def connect_to_db(name_of_db):
+    conn = sqlite3.connect('listings.db')
+    c = conn.cursor()
+    return (c, conn)
+
+
+def listings_db():
+    c = connect_to_db("listings.db")
+    c[0].execute(
+        """CREATE TABLE IF NOT EXISTS listings
+                (id TEXT PRIMARY KEY,
+                created TEXT,
+                name TEXT,
+                price TEXT,
+                location TEXT,
+                url TEXT UNIQUE,
+                description TEXT,
+                jpg TEXT)"""
+    )
+ 
 def get_last_scrape(): 
     with open("listings.csv", newline='') as csvfile:
         last_scrape = '' 
@@ -109,21 +124,6 @@ def craigslist_soup(region, term, last_scrape):
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will NOT append this')
     return list_results 
 
-
-def listings_db():
-    c = connect_to_db("listings.db")
-    c[0].execute(
-        """CREATE TABLE IF NOT EXISTS listings
-                (id TEXT PRIMARY KEY,
-                created TEXT,
-                name TEXT,
-                price TEXT,
-                location TEXT,
-                url TEXT UNIQUE,
-                description TEXT,
-                jpg TEXT)"""
-    )
- 
 def post_to_slack(result_listings): 
     client = WebClient(SLACK_TOKEN)  
     for item in result_listings:     
@@ -134,7 +134,6 @@ def post_to_slack(result_listings):
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
 def insert_into_csv_db(result_listings, last_scrape): 
-    #add to listings csv 
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
             "id",
