@@ -55,7 +55,6 @@ def get_last_scrape():
  
     return last_scrape
  
-
 def craigslist_soup(region, term, last_scrape): 
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
         region=region, term=term
@@ -116,14 +115,14 @@ def craigslist_soup(region, term, last_scrape):
 
         if pd.isnull(pd.to_datetime(last_scrape)):
             list_results.append(result_listings)
-            print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
+            print(f'the datetime is NULL. Listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this AND POST TO SLACK')
         elif pd.to_datetime(result_listings['created_at']) > (pd.to_datetime(last_scrape)):
             list_results.append(result_listings)
-            print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
+            print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this AND POST TO SLACK')
         else:  
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will NOT append this')
-    return list_results 
-
+    return list_results
+    
 def post_to_slack(result_listings): 
     client = WebClient(SLACK_TOKEN)  
     for item in result_listings:     
@@ -133,7 +132,7 @@ def post_to_slack(result_listings):
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
-def insert_into_csv_db(result_listings, last_scrape): 
+def insert_into_csv_db(result_listings):
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
             "id",
