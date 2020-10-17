@@ -28,38 +28,20 @@ def connect_to_db(name_of_db):
 #         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
 #         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
 #         writer.writeheader()
-def listings_db():
-    c = connect_to_db("listings.db")
-    c[0].execute(
-        """CREATE TABLE IF NOT EXISTS listings
-                (id TEXT PRIMARY KEY,
-                created TEXT,
-                name TEXT,
-                price TEXT,
-                location TEXT,
-                url TEXT UNIQUE,
-                description TEXT,
-                jpg TEXT)"""
-    )
-listings_db()
 # create_csv_db()
 
 def get_last_scrape(): 
     with open("listings.csv", newline='') as csvfile:
         last_scrape = '' 
         df = pd.read_csv('listings.csv') 
-        print(f'df is {df}') 
         if not df.empty:   
             last_scrape = df['created'].max()  
             last_scrape = pd.to_datetime(last_scrape) 
-        print(f'FIRST CALL last_scrape is {last_scrape}')
-
+ 
     return last_scrape
+ 
 
-get_last_scrape()
-
-def craigslist_soup(region, term, last_scrape):
-    print(f'craigslist soup {last_scrape}')
+def craigslist_soup(region, term, last_scrape): 
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
         region=region, term=term
     )
@@ -91,7 +73,6 @@ def craigslist_soup(region, term, last_scrape):
         final_strip = stripped.replace("\n\n", "")
         posting_body.append(final_strip)  
     for index, post in enumerate(posts):
-        # print(index,post)
         planter_description_full = posting_body[index] 
         image_url_jpg = image_jpg_list[index]
         result_price = post.find("span", class_="result-price")
@@ -126,13 +107,31 @@ def craigslist_soup(region, term, last_scrape):
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will append this')
         else:  
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will NOT append this')
-    print(list_results)
-    print(f'last SCRAPE is {last_scrape}')
     return list_results 
 
-craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
 
-c_l = craigslist_soup(region='sfbay', term='planter',last_scrape=get_last_scrape())
+def listings_db():
+    c = connect_to_db("listings.db")
+    c[0].execute(
+        """CREATE TABLE IF NOT EXISTS listings
+                (id TEXT PRIMARY KEY,
+                created TEXT,
+                name TEXT,
+                price TEXT,
+                location TEXT,
+                url TEXT UNIQUE,
+                description TEXT,
+                jpg TEXT)"""
+    )
+ 
+def post_to_slack(result_listings): 
+    client = WebClient(SLACK_TOKEN)  
+    for item in result_listings:     
+        sliced_description = item['description']
+        sliced_description = sliced_description[:100] + '...'
+        desc = f" {item['cl_id']} | {item['price']} | {item['created_at']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
+    print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
 def insert_into_csv_db(result_listings, last_scrape): 
     #add to listings csv 
@@ -178,43 +177,27 @@ def insert_into_csv_db(result_listings, last_scrape):
                 item['jpg'],            ),
         )
         c[1].commit()
-insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
 
-
-
-def post_to_slack(result_listings):
-    client = WebClient(SLACK_TOKEN) 
-    print(f'client is {client}')  
-    print(f'slack result listings {result_listings}')
-    for item in result_listings:     
-        sliced_description = item['description']
-        sliced_description = sliced_description[:100] + '...'
-        desc = f" {item['cl_id']} | {item['price']} | {item['created_at']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
-    print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
-result_listings = c_l
-schedule.every(1).hour.do(post_to_slack, result_listings) 
-
-if __name__ == "__main__": 
+if __name__ == "__main__":
+    connect_to_db('listings.db')
+    listings_db()
+             
     while True:
         print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
-            connect_to_db('listings.db')
-            listings_db()
-            get_last_scrape()
-            craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
-            # create_csv_db()
-            insert_into_csv_db(result_listings=c_l, last_scrape=get_last_scrape())
-            post_to_slack(result_listings) 
+            c_l= craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
+            post_to_slack(result_listings=c_l) 
+            insert_into_csv_db(result_listings=c_l)
+            
         except KeyboardInterrupt:
             print("Exiting....")
             sys.exit(1)
         except Exception as exc:
             print("Error with the scraping:", sys.exc_info()[0])
             traceback.print_exc()
-        else:
-            in_one_hour = datetime.now() + timedelta(hours=1)
-            print(in_one_hour)
-            print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_one_hour)) 
+        
+        in_ten_minutes = datetime.now() + timedelta(minutes=10)
+        print(in_ten_minutes)
+        print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_ten_minutes)) 
         schedule.run_pending()
-        time.sleep(2400) 
+        time.sleep(600) 
