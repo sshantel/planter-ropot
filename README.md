@@ -1,4 +1,4 @@
-Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to database, and posted to a channel with Slack’s API. Deployed on Heroku’s Cloud service.
+Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to database, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
  
 <h4>Technologies</h4>
  
