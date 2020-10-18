@@ -91,13 +91,16 @@ def craigslist_soup(region, term, last_scrape):
             "jpg": image_url_jpg,
         }  
 
-if pd.isnull(pd.to_datetime(last_scrape)): list_results.append(result_listings)
-    print(f'the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so                                  we will append this AND POST TO SLACK')
-elif pd.to_datetime(result_listings['created_at']) > (pd.to_datetime(last_scrape)):
-    list_results.append(result_listings)
-    print(f'Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK')
-else:
-    print(f'Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this.')
+    if pd.isnull(pd.to_datetime(last_scrape)): 
+        list_results.append(result_listings)
+        print(f'the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK')
+    elif pd.to_datetime(result_listings['created_at']) > (pd.to_datetime(last_scrape)):
+        list_results.append(result_listings)
+        print(f'Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK')
+    else:
+        print(f'Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this.')
+
+    return list_results
 
 def insert_into_csv_db(result_listings):
     with open("listings.csv", "a") as csvfile:
