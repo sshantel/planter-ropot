@@ -18,12 +18,12 @@ import traceback
 SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
 SLACK_CHANNEL = "#planter_ropot"
 
-# def create_csv_db():
-#     with open("listings.csv", "w", newline="") as csvfile:
-#         csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
-#         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-#         writer.writeheader()
-# create_csv_db()
+def create_csv():
+    if not os.path.isfile('listings.csv'):
+        with open("listings.csv", "w", newline="") as csvfile:
+            csv_headers = ["id", "created", "name", "price", "location", "url", "description", "jpg"]
+            writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+            writer.writeheader()
  
 def get_last_scrape(): 
     with open("listings.csv", newline='') as csvfile:
@@ -142,13 +142,15 @@ def insert_into_csv_db(result_listings):
     csvfile.close()
 
 if __name__ == "__main__": 
-             
+    create_csv()
+
     while True:
         print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
             c_l = craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
-            post_to_slack(result_listings=c_l) 
             insert_into_csv_db(result_listings=c_l)
+            post_to_slack(result_listings=c_l) 
+             
             
         except KeyboardInterrupt:
             print("Exiting....")
