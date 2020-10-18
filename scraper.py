@@ -24,26 +24,6 @@ SLACK_CHANNEL = "#planter_ropot"
 #         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
 #         writer.writeheader()
 # create_csv_db()
-
-def connect_to_db(name_of_db):
-    conn = sqlite3.connect('listings.db')
-    c = conn.cursor()
-    return (c, conn)
-
-
-def listings_db():
-    c = connect_to_db("listings.db")
-    c[0].execute(
-        """CREATE TABLE IF NOT EXISTS listings
-                (id TEXT PRIMARY KEY,
-                created TEXT,
-                name TEXT,
-                price TEXT,
-                location TEXT,
-                url TEXT UNIQUE,
-                description TEXT,
-                jpg TEXT)"""
-    )
  
 def get_last_scrape(): 
     with open("listings.csv", newline='') as csvfile:
@@ -160,30 +140,12 @@ def insert_into_csv_db(result_listings):
             )
     csvfile.close()
 
-    c = connect_to_db("listings.db") 
-    for item in result_listings:   
-        c[0].execute(
-            "INSERT OR REPLACE INTO listings VALUES(?,?,?,?,?,?,?,?)",
-            (
-                item['cl_id'],
-                item['created_at'],
-                item['title_text'],
-                item['price'],
-                item['neighborhood_text'],
-                item['url'],
-                item['description'],
-                item['jpg'],            ),
-        )
-        c[1].commit()
-
-if __name__ == "__main__":
-    connect_to_db('listings.db')
-    listings_db()
+if __name__ == "__main__": 
              
     while True:
         print("Starting scrape cycle of planters in the SF Bay Area: {}".format(time.ctime()))
         try:
-            c_l= craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
+            c_l = craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
             post_to_slack(result_listings=c_l) 
             insert_into_csv_db(result_listings=c_l)
             
