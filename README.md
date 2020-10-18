@@ -4,7 +4,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 
 <b> APIs </b> : Slack  
 
-<b> Installation </b>
+<h4> Installation </h4>
 You must have the following installed to run Craigslist-Ropot:
   
 Slack 
