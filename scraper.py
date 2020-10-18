@@ -156,8 +156,7 @@ if __name__ == "__main__":
             print("Error with the scraping:", sys.exc_info()[0])
             traceback.print_exc()
         
-        in_ten_minutes = datetime.now() + timedelta(minutes=10)
-        print(in_ten_minutes)
+        in_ten_minutes = datetime.now() + timedelta(minutes=10) 
         print("{}: Successfully finished scraping. Next scrape will be at {} ".format(time.ctime(), in_ten_minutes)) 
         schedule.run_pending()
         time.sleep(600) 
