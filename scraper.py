@@ -4,10 +4,8 @@ import os
 from slack import WebClient
 from bs4 import BeautifulSoup as b_s
 
-import csv
-import operator
-import pandas as pd
-import sqlite3
+import csv 
+import pandas as pd 
 
 import time
 from datetime import datetime, date, timedelta 
