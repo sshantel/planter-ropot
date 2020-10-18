@@ -100,16 +100,6 @@ def craigslist_soup(region, term, last_scrape):
         else:  
             print(f'the listing was posted at {created_at} and the last scrapetime was {last_scrape} so we will NOT append this')
     return list_results
-    
-def post_to_slack(result_listings): 
-    client = WebClient(SLACK_TOKEN)  
-    for item in result_listings:     
-        sliced_description = item['description']
-        sliced_description = sliced_description[:100] + '...'
-        desc = f" {item['cl_id']} | {item['price']} | {item['created_at']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
-        print(response)
-    print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
 def insert_into_csv_db(result_listings):
     with open("listings.csv", "a") as csvfile:
@@ -138,6 +128,16 @@ def insert_into_csv_db(result_listings):
                 }
             )
     csvfile.close()
+    
+def post_to_slack(result_listings): 
+    client = WebClient(SLACK_TOKEN)  
+    for item in result_listings:     
+        sliced_description = item['description']
+        sliced_description = sliced_description[:100] + '...'
+        desc = f" {item['cl_id']} | {item['price']} | {item['created_at']} | {item['title_text']} | {item['url']} | {item['neighborhood_text']} | {sliced_description} | {item['jpg']}  "
+        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
+        print(response)
+    print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
 if __name__ == "__main__": 
     create_csv()
@@ -148,7 +148,6 @@ if __name__ == "__main__":
             c_l = craigslist_soup(region='sfbay',term='planter', last_scrape=get_last_scrape())
             insert_into_csv_db(result_listings=c_l)
             post_to_slack(result_listings=c_l) 
-             
             
         except KeyboardInterrupt:
             print("Exiting....")
