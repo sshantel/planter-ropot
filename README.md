@@ -19,10 +19,8 @@ Requests Library
 <br>
  
  <h4> External Setup </h4>
-
-You'll need a Slack workspace, a channel for the Slackbot to post,and a Slackbot API key.
  
-* Create Slack <a href="https://slack.com/create#email"> workspace </a> 
+* Slack <a href="https://slack.com/create#email"> workspace </a> 
 * Create an <a href= "https://api.slack.com/apps"> App </a> on your workspace  
 * Add `chat:write` and `links:write` Bot OAuth Token scopes under Add Features and Functionality --> Permissions
 * Install App to workspace
