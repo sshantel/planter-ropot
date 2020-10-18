@@ -11,9 +11,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 <i>You must have the following installed to run Craigslist-Ropot: </i>
  
 <br>
-Slack
-<br>
-An App on Slack: https://api.slack.com/apps 
+Slack 
 <br>
 Python3 
 <br>
@@ -30,6 +28,7 @@ You'll need a Slack workspace, a channel for the Slackbot to post,and a Slackbot
 * Install App to workspace
 * Create channel for bot to post into
 * Add bot to channel
+![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file:
 `export SLACK_API_TOKEN='INSERT-TOKEN-HERE'`
 
