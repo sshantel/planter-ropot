@@ -1,10 +1,11 @@
 ## Table of contents
-* <a href="https://github.com/sshantel/planter-ropot#-installation-"> Installation>
-* <a href="https://github.com/sshantel/planter-ropot#-external-setup-"> External Setup>
+* <a href="https://github.com/sshantel/planter-ropot#-about-"> Installation
+* <a href="https://github.com/sshantel/planter-ropot#-installation-"> Installation
+* <a href="https://github.com/sshantel/planter-ropot#-external-setup-"> External Setup
 
 
 
-<h5> WORK IN PROGRESS </h5>
+<h5> About </h5>
 
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to database, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
