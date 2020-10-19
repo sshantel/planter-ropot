@@ -16,10 +16,11 @@ Requests Library
  <h4> External Setup </h4>
  
 * Slack <a href="https://slack.com/create#email"> workspace </a> 
-* Create an <a href= "https://api.slack.com/apps"> App </a> on your workspace  
+* An <a href= "https://api.slack.com/apps"> App </a> on your workspace  
 * Add `chat:write` and `links:write` Bot OAuth Token scopes under Add Features and Functionality --> Permissions
+![](static/images/add_app_slack.png "slackbot_oath_scopes")
 * Install App to workspace
-* Create channel for bot to post into
+* Channel for bot to post into
 * Add bot to channel
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
