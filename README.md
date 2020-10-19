@@ -30,7 +30,7 @@ Requests Library
 1. Clone or fork repository:
 
 ```
-$ git clone https://github.com/sshantel/craigslist-ropot
+$ git clone https://github.com/sshantel/planter-ropot
 ```
 
 
