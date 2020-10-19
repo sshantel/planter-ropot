@@ -41,5 +41,9 @@ Requests Library
 $ git clone https://github.com/sshantel/planter-ropot
 ```
 
+2. If you don't want to look for planters in the SF Bay Area, you'll need to update the ```region``` and ```term``` in line 149 of ```scraper.py``` to fit your desired needs. 
+
+
+
 <h4> Deployment </h4>
  
