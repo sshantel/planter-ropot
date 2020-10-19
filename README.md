@@ -22,9 +22,7 @@ Requests Library
 * Create channel for bot to post into
 * Add bot to channel
 ![](static/images/add_app_slack.png "add_app_slack.png")
-* Store Slack API in secrets.sh file:
-<br>
-```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
+* Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
 <b> Running Ropot-Planter on your computer </b>
 
