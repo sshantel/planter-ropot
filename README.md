@@ -18,6 +18,7 @@ Requests Library
 * Install App to workspace
 * Create channel for bot to post into
 * Add bot to channel
+<br>
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file:
 `export SLACK_API_TOKEN='INSERT-TOKEN-HERE'`
