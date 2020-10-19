@@ -13,7 +13,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 
 
 <br>
-You must have the following installed to run Craigslist-Ropot:
+You must have the following installed to run Planter-Ropot:
   
 Slack 
 <br>
