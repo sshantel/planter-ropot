@@ -23,7 +23,7 @@ Requests Library
  <h4> External Setup </h4>
 
 
-* Slack workspace <a href="https://slack.com/create#email"> workspace </a> 
+* <a href="https://slack.com/create#email"> Slack workspace </a> 
 * An <a href= "https://api.slack.com/apps"> App </a> on your workspace  
 * Add `chat:write`  `links:write` OAuth Token scopes under Add Features and Functionality --> Permissions:
 ![](static/images/slackbot_oath_scopes.png "slackbot_oath_scopes")
