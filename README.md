@@ -29,6 +29,7 @@ Requests Library
 * Slack <a href="https://slack.com/create#email"> workspace </a> 
 * An <a href= "https://api.slack.com/apps"> App </a> on your workspace  
 * Add `chat:write` and `links:write` Bot OAuth Token scopes under Add Features and Functionality --> Permissions
+<br>
 ![](static/images/slackbot_oath_scopes.png "slackbot_oath_scopes")
 * Install App to workspace
 * Channel for bot to post into
