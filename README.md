@@ -1,3 +1,5 @@
+<h5> WORK IN PROGRESS </h5>
+
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to database, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 <h4> Installation </h4>
