@@ -27,10 +27,6 @@ Requests Library
 * An <a href= "https://api.slack.com/apps"> App </a> on your workspace  
 * Add `chat:write`  `links:write` OAuth Token scopes under Add Features and Functionality --> Permissions:
 ![](static/images/slackbot_oath_scopes.png "slackbot_oath_scopes")
-
-<p align="center">
-  <img width="460" height="300" src="http://www.fillmurray.com/460/300">
-</p>
 * Install App to workspace
 * Channel for bot to post into
 * Add bot to channel
