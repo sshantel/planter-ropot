@@ -1,6 +1,7 @@
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to database, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 <h4> Installation </h4>
+<br>
 You must have the following installed to run Craigslist-Ropot:
   
 Slack 
@@ -18,10 +19,9 @@ Requests Library
 * Install App to workspace
 * Create channel for bot to post into
 * Add bot to channel
-<br>
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file:
-`export SLACK_API_TOKEN='INSERT-TOKEN-HERE'`
+```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
 <b> Running Ropot-Planter on your computer </b>
 
