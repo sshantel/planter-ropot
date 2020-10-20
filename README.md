@@ -49,7 +49,7 @@ Listings should now be posting on the desired Slack channel, if such listings in
 
 2. Store the Slack API using the following command:
 ```
-$ heroku config:set SLACK_API_TOKEN='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
+heroku config:set SLACK_API_TOKEN='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
 ```
 3. Adjust Heroku timezone according to your location(otherwise it defaults to UTC)
 ```
