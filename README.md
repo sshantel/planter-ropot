@@ -8,7 +8,7 @@
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 ![](static/images/demo_planter1.gif)
-<i> Note: Per my conversation with Slack support, there is a bug where Slackbot posts with unfurled images show as "edited".  Their team is currently working on getting this fixed.</i>
+<i> Note: Per my conversation with Slack's support team, there is a bug where Slackbot posts with unfurled images show as "edited".  Their team is currently working on getting this fixed.</i>
  
  <h4> External Setup </h4>
 
@@ -36,7 +36,7 @@ $ git clone https://github.com/sshantel/planter-ropot
 $ pip install -r requirements.txt
 ```
 
-3. For a scraping of items outside of planters in the SF Bay Area, ```region``` and ```term```  in line 149 of ```scraper.py``` will need to be updated to fit your desired needs. The URL in line 37 can be adjusted according to which link you want to scrape.
+3. For a scraping of items outside of planters in the SF Bay Area, ```region``` and ```term```  in line 149 of ```scraper.py``` will need to be updated to fit your desired needs. The URL in line 37 can be adjusted according to the Craigslist link you wish to scrape.
 
 4. Source the Slackbot API by running the following command:
 ```
