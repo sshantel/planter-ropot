@@ -19,7 +19,8 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 * Channel for bot to post into
 * Add bot to channel
 ![](static/images/add_app_slack.png "add_app_slack.png")
-* Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
+* Store Slack API in secrets.sh file: 
+```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
 <b> Running Planter-Ropot locally on your computer </b>
 
@@ -29,13 +30,16 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 $ git clone https://github.com/sshantel/planter-ropot
 ```
 
-2. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to what you want to scrape on Craigslist as well.
+2. Install dependencies:
+$ pip install -r requirements.txt
 
-3. Source the Slackbot API by running the following command:
+3. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to what you want to scrape on Craigslist as well.
+
+4. Source the Slackbot API by running the following command:
 ```
 $ source secrets.sh 
 ```
-4. Final command to run Planter-Ropot locally:
+5. Final command to run Planter-Ropot locally:
 ```
 $ python3 scraper.py
 ```
