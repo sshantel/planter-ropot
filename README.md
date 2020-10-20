@@ -43,7 +43,7 @@ $ source secrets.sh
 ```
 $ python3 scraper.py
 ```
-Listings should now be posting on the desired Slack channel, if such listings in your Craigslist region with keywords exist.
+Listings will post on the desired Slack channel if such listings in your Craigslist region with keywords exist.
 
 <h4> Deployment </h4>
 
