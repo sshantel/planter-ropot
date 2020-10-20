@@ -36,7 +36,7 @@ $ git clone https://github.com/sshantel/planter-ropot
 $ pip install -r requirements.txt
 ```
 
-3. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to which link you want to scrape.
+3. For a scraping of items outside of planters in the SF Bay Area, ```region``` and ```term```  in line 149 of ```scraper.py``` will need to be updated to fit your desired needs. The URL in line 37 can be adjusted according to which link you want to scrape.
 
 4. Source the Slackbot API by running the following command:
 ```
