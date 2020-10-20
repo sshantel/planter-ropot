@@ -9,8 +9,14 @@
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 <h4> Installation </h4>
+<<<<<<< HEAD
 <br>
 You must have the following installed to run craigslist-ropot:
+=======
+<br> 
+You must have the following installed to run Planter-Ropot:
+ 
+>>>>>>> f7560adf47c3ac1e125220a33a39a89c2d2a48e1
   
 Slack 
 <br>
