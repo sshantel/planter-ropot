@@ -10,7 +10,11 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 
 <h4> Installation </h4>
 <br>
+<<<<<<< HEAD
 You must have the following installed to run Craigslist-Ropot:
+=======
+You must have the following installed to run planter-ropot:
+>>>>>>> 8c2735f343bb776770f3db9b959e0a0a55a9289e
   
 Slack 
 <br>
@@ -33,7 +37,7 @@ Requests Library
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
-<b> Running Ropot-Planter on your computer </b>
+<b> Running Planter-Ropot on your computer </b>
 
 1. Clone or fork repository:
 
@@ -46,4 +50,3 @@ $ git clone https://github.com/sshantel/craigslist-ropot
 
 
 <h4> Deployment </h4>
- 
