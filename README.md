@@ -1,7 +1,7 @@
 ## Table of contents
 * <a href="https://github.com/sshantel/planter-ropot#-about-"> About
-* <a href="https://github.com/sshantel/planter-ropot#-installation-"> Installation
 * <a href="https://github.com/sshantel/planter-ropot#-external-setup-"> External Setup
+* <a href="https://github.com/sshantel/planter-ropot#-deployment"> Deployment
 
 <h4> About </h4>
 
