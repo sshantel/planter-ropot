@@ -9,10 +9,8 @@
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 <h4> Installation </h4>
-<br> 
 You must have the following installed to run Planter-Ropot:
- 
-  
+<br> 
 Slack 
 <br>
 Python3 
@@ -36,7 +34,7 @@ Requests Library
 
 <b> Running Planter-Ropot locally on your computer </b>
 
-1. Clone or fork repository:
+1. Clone repository
 
 ```
 $ git clone https://github.com/sshantel/planter-ropot
