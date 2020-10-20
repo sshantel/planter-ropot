@@ -1,7 +1,7 @@
 ## Table of contents
-* <a href="https://github.com/sshantel/craigslist-ropot#-about-"> About
-* <a href="https://github.com/sshantel/craigslist-ropot#-installation-"> Installation
-* <a href="https://github.com/sshantel/craigslist-ropot#-external-setup-"> External Setup
+* <a href="https://github.com/sshantel/planter-ropot#-about-"> About
+* <a href="https://github.com/sshantel/planter-ropot#-installation-"> Installation
+* <a href="https://github.com/sshantel/planter-ropot#-external-setup-"> External Setup
 
 
 <h5> About </h5>
@@ -9,14 +9,9 @@
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
 <h4> Installation </h4>
-<<<<<<< HEAD
-<br>
-You must have the following installed to run craigslist-ropot:
-=======
 <br> 
 You must have the following installed to run Planter-Ropot:
  
->>>>>>> f7560adf47c3ac1e125220a33a39a89c2d2a48e1
   
 Slack 
 <br>
@@ -39,12 +34,12 @@ Requests Library
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
-<b> Running Craigslist-Ropot on your computer </b>
+<b> Running Planter-Ropot on your computer </b>
 
 1. Clone or fork repository:
 
 ```
-$ git clone https://github.com/sshantel/craigslist-ropot
+$ git clone https://github.com/sshantel/planter-ropot
 ```
 
 2. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to what you want to scrape on Craigslist as well.
