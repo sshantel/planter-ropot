@@ -54,11 +54,11 @@ $ heroku config:set SLACK_API_TOKEN='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
 $ heroku config:add TZ="America/Los_Angeles"
 ```
 4. Add and commit files
-5. 
 ```
-$ heroku open
+$ git add .
 ```
-6. Scale worker dyno
+
+5. Scale worker dyno
 ```
 $ heroku ps:scale worker=1
 ```
