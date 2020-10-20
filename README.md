@@ -7,7 +7,7 @@
 
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
 
-![](static/images/demo_planter1.gif)
+![](static/images/planter-ropot-demo.gif)
 <i> Note: Per my conversation with Slack's support team, there is a bug where Slackbot posts with unfurled images show as "edited".  Their team is currently working on getting this fixed.</i>
  
  <h4> External Setup </h4>
