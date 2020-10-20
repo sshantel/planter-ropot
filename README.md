@@ -17,7 +17,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 * Add `chat:write`  `links:write` OAuth Token scopes under Add Features and Functionality --> Permissions:
     * ![](static/images/slackbot_oath_scopes.png "slackbot_oath_scopes")
 * Install App to workspace
-* Channel for bot to post into
+* <a href="https://slack.com/help/articles/201402297-Create-a-channel"> Create Channel </a> for bot to post into
 * Add bot to channel:
     * ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: 
