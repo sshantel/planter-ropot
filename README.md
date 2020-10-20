@@ -20,7 +20,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 * Add bot to channel:
     * ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: 
-```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
+    * ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
 <b> Running Planter-Ropot locally on your computer </b>
 
