@@ -45,6 +45,7 @@ def craigslist_soup(region, term, last_scrape):
     posting_body = []
     list_results = []
     for post in posts:
+        print(post)
         title_class = post.find("a", class_="result-title hdrlnk")
         links.append(title_class["href"]) 
     for link in links: 
@@ -137,7 +138,6 @@ def post_to_slack(result_listings):
         sliced_description = sliced_description[:100] + '...'
         desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['jpg']} | {item['cl_id']}  "
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc) 
-        print(response)
     print("End scrape {}: Got {} results".format(datetime.now(), len(result_listings)))
 
 if __name__ == "__main__": 
