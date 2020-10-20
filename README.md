@@ -44,9 +44,14 @@ $ git clone https://github.com/sshantel/planter-ropot
 
 2. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to what you want to scrape on Craigslist as well.
 
-3.
+3. Source the Slackbot API by running the following command:
+```
+$ source secrets.sh 
+```
+4. Final command to run Planter-Ropot locally:
 ```
 $ python3 scraper.py
 ```
+Listings should now be posting on the desired Slack channel, if such listings in your Craigslist region with keywords exist.
 
 <h4> Deployment </h4>
