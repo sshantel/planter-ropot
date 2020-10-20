@@ -34,7 +34,7 @@ Requests Library
 ![](static/images/add_app_slack.png "add_app_slack.png")
 * Store Slack API in secrets.sh file: ```export SLACK_API_TOKEN='INSERT-TOKEN-HERE'```
 
-<b> Running Planter-Ropot on your computer </b>
+<b> Running Planter-Ropot locally on your computer </b>
 
 1. Clone or fork repository:
 
@@ -44,6 +44,9 @@ $ git clone https://github.com/sshantel/planter-ropot
 
 2. If you don't want to search for planters for sale in the SF Bay Area, you'll need to update the ```region``` and ```term```  in line 149 of ```scraper.py``` to fit your desired needs. The URL in line 37 can be adjusted according to what you want to scrape on Craigslist as well.
 
-
+3.
+```
+$ python3 scraper.py
+```
 
 <h4> Deployment </h4>
