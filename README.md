@@ -3,13 +3,11 @@
 * <a href="https://github.com/sshantel/planter-ropot#-installation-"> Installation
 * <a href="https://github.com/sshantel/planter-ropot#-external-setup-"> External Setup
 
-
 <h4> About </h4>
 
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. Deployed on Heroku’s Cloud service.
  
  <h4> External Setup </h4>
-
 
 * Slack <a href="https://slack.com/create#email"> workspace </a> 
 * An <a href= "https://api.slack.com/apps"> App </a> on your workspace  
