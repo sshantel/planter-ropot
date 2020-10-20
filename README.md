@@ -53,3 +53,24 @@ $ python3 scraper.py
 Listings should now be posting on the desired Slack channel, if such listings in your Craigslist region with keywords exist.
 
 <h4> Deployment </h4>
+
+1. Download and Install <a href="https://devcenter.heroku.com/articles/heroku-cli#download-and-install"> Heroku </a>
+
+2. Store the Slack API using the following command:
+```
+$ heroku config:set SLACK_API_TOKEN='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
+```
+3. Adjust Heroku timezone according to your location(otherwise it defaults to UTC)
+```
+$ heroku config:add TZ="America/Los_Angeles"
+```
+4. Add and commit files
+5. 
+```
+$ heroku open
+```
+6. Scale worker dyno
+```
+$ heroku ps:scale worker=1
+```
+
