@@ -53,6 +53,7 @@ toml==0.10.1
 traitlets==4.3.3
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
+twilio==6.46.0
 urllib3==1.25.10
 virtualenv==20.0.30
 wcwidth==0.1.9
