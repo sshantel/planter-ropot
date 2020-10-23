@@ -168,7 +168,7 @@ def insert_into_csv_db(result_listings):
 
 def send_text_message(result_listings):
     for item in result_listings:
-        if item["neighborhood_text"].strip() == "(Mountain View)":
+        if item["neighborhood_text"].strip().lower() == "(mountain view)":
             message = client.messages.create(
                 body="There's a planter in your neighborhood!" + item["url"],
                 from_="+12054966699",
