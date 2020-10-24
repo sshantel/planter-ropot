@@ -30,7 +30,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
 1. Clone repository:
 
 ```
-$ git clone https://github.com/sshantel/craigslist-ropot
+$ git clone https://github.com/sshantel/Planter-Ropot
 ```
 
 2. Install dependencies:
@@ -47,7 +47,7 @@ $ pip install -r requirements.txt
 $ source secrets.sh
 ```
 
-5. Final command to run Craigslist-Ropot locally:
+5. Final command to run Planter-Ropot locally:
 
 ```
 $ python3 scraper.py
