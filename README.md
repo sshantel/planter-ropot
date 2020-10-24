@@ -59,7 +59,9 @@ Listings will post on the desired Slack channel if such listings in your Craigsl
 
 1. Download and Install <a href="https://devcenter.heroku.com/articles/heroku-cli#download-and-install"> Heroku </a>
 
-2. Store the Slack and Twilio API using the following commands
+2. Create Heroku <a href="https://devcenter.heroku.com/articles/creating-apps"> app </a>
+
+3. Store the Slack and Twilio API using the following commands
 
 ```
 heroku config:set SLACK_API_TOKEN='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
@@ -73,25 +75,25 @@ heroku config:set twilio_api='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
 heroku config:set twilio_auth='INSERT-TOKEN-BETWEEN-THESE-SINGLE-QUOTES'
 ```
 
-3. Store personal phone number
+4. Store personal phone number
 
 ```
 heroku config:set my_phone_number='INSERT-PHONE-NUMBER-BETWEEN-THESE-SINGLE-QUOTES'
 ```
 
-4. Adjust Heroku <a href="https://help.heroku.com/JZKJJ4NC/how-do-i-set-the-timezone-on-my-dyno"> timezone </a> according to your location(otherwise it defaults to UTC)
+5. Adjust Heroku <a href="https://help.heroku.com/JZKJJ4NC/how-do-i-set-the-timezone-on-my-dyno"> timezone </a> according to your location(otherwise it defaults to UTC)
 
 ```
 $ heroku config:add TZ="America/Los_Angeles"
 ```
 
-5. Add and commit files
+6. Add and commit files
 
 ```
 $ git add .
 ```
 
-6. Scale worker dyno
+7. Scale worker dyno
 
 ```
 $ heroku ps:scale worker=1
