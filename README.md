@@ -23,7 +23,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
   - ![](static/images/add_app_slack.png "add_app_slack.png")
 - Store Slack API in secrets.sh file:
   - `export SLACK_API_TOKEN='INSERT-TOKEN-HERE'`
-  - Twilio <a href="https://www.twilio.com/docs/usage/api"> REST API </a>
+- Twilio <a href="https://www.twilio.com/docs/usage/api"> REST API </a>
 
 <b> Running Planter-Ropot locally on your computer </b>
 
