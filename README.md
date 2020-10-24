@@ -25,7 +25,7 @@ Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist posti
   - `export SLACK_API_TOKEN='INSERT-TOKEN-HERE'`
   - Twilio <a href="https://www.twilio.com/docs/usage/api"> REST API </a>
 
-<b> Running Craigslist-Ropot locally on your computer </b>
+<b> Running Planter-Ropot locally on your computer </b>
 
 1. Clone repository:
 
