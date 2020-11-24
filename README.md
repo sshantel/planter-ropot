@@ -7,7 +7,11 @@
 <h4> About </h4>
 
 <a href="https://chantelyip.com/2020/11/24/scraping-craigslist-to-find-my-perfect-planter-with-slackbot-and-twilio/"> Blog Post
+<br>
+
 <a href="https://chantelyip.com/2020/11/24/scraping-craigslist-to-find-my-perfect-planter-with-slackbot-and-twilio/"> Video
+
+<br>
 
 
 Utilizes Python Requests and Beautiful Soup libraries to scrape Craigslist postings by keyword search. Listings are written to CSV, and posted to a Slack channel with Slack’s API. A text message is sent using Twilio's REST API if the listing is located in the user's city. Deployed on Heroku’s Cloud service.
