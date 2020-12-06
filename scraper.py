@@ -205,7 +205,7 @@ if __name__ == "__main__":
             )
             insert_into_csv_db(result_listings=c_l)
             send_text_message(result_listings=c_l)
-            # post_to_slack(result_listings=c_l)
+            post_to_slack(result_listings=c_l)
         except KeyboardInterrupt:
             print("Exiting....")
             sys.exit(1)
