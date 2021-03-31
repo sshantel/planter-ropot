@@ -181,6 +181,9 @@ def post_to_slack(result_listings):
         sliced_description = item["description"]
         sliced_description = sliced_description[:100] + "..."
         desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']}  "
+        print( {item['url']})
+        print({sliced_description} )
+        print({item['cl_id']})
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
     print(
         "End Slack function {}: Got {} results".format(
