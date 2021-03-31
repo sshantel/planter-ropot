@@ -193,7 +193,7 @@ def post_to_slack(result_listings):
 
 
 if __name__ == "__main__":
-``
+
     while True:
         print(
             "Starting scrape cycle of planters in the SF Bay Area: {}".format(
