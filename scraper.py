@@ -180,10 +180,7 @@ def post_to_slack(result_listings):
     for item in result_listings:
         sliced_description = item["description"]
         sliced_description = sliced_description[:100] + "..."
-        desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']}  "
-        print( {item['url']})
-        print({sliced_description} )
-        print({item['cl_id']})
+        desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']} |  {item["jpg"]}
         response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
     print(
         "End Slack function {}: Got {} results".format(
@@ -215,10 +212,10 @@ if __name__ == "__main__":
             print("Error with the scraping:", sys.exc_info()[0])
             traceback.print_exc()
 
-        in_ten_minutes = datetime.now() + timedelta(minutes=60)
+        in_one_hour = datetime.now() + timedelta(minutes=60)
         print(
             "{}: Successfully finished scraping. Next scrape will be at {} ".format(
-                time.ctime(), in_ten_minutes
+                time.ctime(), in_one_hour
             )
         )
         schedule.run_pending()
