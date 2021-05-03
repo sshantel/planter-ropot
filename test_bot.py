@@ -1,3 +1,5 @@
+from scraper import *
+
 import unittest
 import requests
 
