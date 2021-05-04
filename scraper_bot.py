@@ -29,6 +29,19 @@ client = Client(account_sid, auth_token)
 my_phone_number = os.environ["my_phone_number"]
 
 
+def craigslist_handler(handler):
+    response = requests.get("craigslist.org")
+    if response == 400:
+        print("error 400")
+        return 1
+    if response == 402:
+        print("error 402")
+        return 1
+    ...
+    if response == 200:
+        print("success")
+        return 0
+
 def create_csv():
     if not os.path.isfile("listings.csv"):
         with open("listings.csv", "w", newline="") as csvfile:
