@@ -6,12 +6,10 @@ import requests
 
 class TestSlackBot(unittest.TestCase):
     def test_handler(self):
-        apiHandleCode = scraper_bot.craigslist_handler()
-        self.assertEqual(apiHandleCode, 1)
-        apiHandleCode = scraper_bot.slack_handler()
-        self.assertEqual(apiHandleCode, 1)
-        apiHandleCode = scraper_bot.twilio_handler()
+        api_handle_code = scraper_bot.craigslist_handler()
         self.assertEqual(apiHandleCode, 0)
+        api_handle_code = scraper_bot.slack_handler()
+        api_handle_code = scraper_bot.twilio_handler()
 
     def test_slack_api_success(self):
         """Check is Slack API is responsive"""
