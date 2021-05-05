@@ -5,20 +5,13 @@ import requests
 
 
 class TestSlackBot(unittest.TestCase):
-    def test_handler(self):
+    def test_handlers(self):
         api_handle_code = scraper_bot.craigslist_handler()
         self.assertEqual(api_handle_code, 0)
-        # api_handle_code = scraper_bot.slack_handler()
-        # api_handle_code = scraper_bot.twilio_handler()
-
-    def test_slack_api_success(self):
-        """Check is Slack API is responsive"""
-        slack_url = "https://slack.com/api/api.test"
-        response = requests.get(slack_url)
-        result = response.status_code
-        return result
-        """OK"""
-        self.assertEqual(self.test_slack_api_success(), "200")
+        api_handle_code = scraper_bot.slack_handler()
+        self.assertEqual(api_handle_code, 0)
+        api_handle_code = scraper_bot.twilio_handler()
+        self.assertEqual(api_handle_code, 0)
 
     def check_csv(self):
         pass

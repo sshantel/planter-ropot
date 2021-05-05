@@ -37,6 +37,22 @@ def craigslist_handler():
         return 1
 
 
+def slack_handler():
+    response = requests.get("https://slack.com/api/api.test")
+    if response.status_code == 200:
+        return 0
+    else:
+        return 1
+
+
+def twilio_handler():
+    response = requests.get("https://verify.twilio.com/v2/")
+    if response.status_code == 200:
+        return 0
+    else:
+        return 1
+
+
 def create_csv():
     if not os.path.isfile("listings.csv"):
         with open("listings.csv", "w", newline="") as csvfile:
@@ -58,7 +74,6 @@ def get_last_scrape():
     with open("listings.csv", newline="") as csvfile:
         last_scrape = ""
         df = pd.read_csv("listings.csv")
-        print(df)
         if not df.empty:
             last_scrape = df["created"].max()
             last_scrape = pd.to_datetime(last_scrape)
@@ -71,9 +86,7 @@ def craigslist_soup(region, term, last_scrape):
         region=region, term=term
     )
     response = requests.get(url=url)
-    print(craigslist_handler())
     if craigslist_handler() == 0:
-        print("hi")
         soup = b_s(response.content, "html.parser")
         posts = soup.find_all("li", class_="result-row")
         links = []
@@ -177,27 +190,29 @@ def insert_into_csv_db(result_listings):
 
 
 def send_text_message(result_listings):
-    for item in result_listings:
-        if item["neighborhood_text"].strip().lower() == "(san francisco)":
-            message = client.messages.create(
-                body="There's a planter in your neighborhood!" + item["url"],
-                from_="+12054966699",
-                to="+1" + my_phone_number,
-            )
+    if twilio_handler() == 0:
+        for item in result_listings:
+            if item["neighborhood_text"].strip().lower() == "(san francisco)":
+                message = client.messages.create(
+                    body="There's a planter in your neighborhood!" + item["url"],
+                    from_="+12054966699",
+                    to="+1" + my_phone_number,
+                )
 
 
 def post_to_slack(result_listings):
     client = WebClient(SLACK_TOKEN)
-    for item in result_listings:
-        sliced_description = item["description"]
-        sliced_description = sliced_description[:100] + "..."
-        desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']}  "
-        response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
-    print(
-        "End Slack function {}: Got {} results".format(
-            datetime.now(), len(result_listings)
+    if slack_handler() == 0:
+        for item in result_listings:
+            sliced_description = item["description"]
+            sliced_description = sliced_description[:100] + "..."
+            desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']} | {item['jpg']} "
+            response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
+        print(
+            "End Slack function {}: Got {} results".format(
+                datetime.now(), len(result_listings)
+            )
         )
-    )
 
 
 if __name__ == "__main__":
