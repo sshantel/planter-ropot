@@ -30,7 +30,7 @@ my_phone_number = os.environ["my_phone_number"]
 
 
 def craigslist_handler():
-    response = requests.get("craigslist.org")
+    response = requests.get("http://craigslist.org")
     if response.status_code == 200:
         return 0
     else:
@@ -71,6 +71,7 @@ def craigslist_soup(region, term, last_scrape):
         region=region, term=term
     )
     response = requests.get(url=url)
+    print(craigslist_handler())
     if craigslist_handler() == 0:
         print("hi")
         soup = b_s(response.content, "html.parser")
