@@ -80,6 +80,20 @@ def get_last_scrape():
 
     return last_scrape
 
+def mock_scrape():
+    if not os.path.isfile("mock_listings.csv"):
+        with open("mock_listings.csv", "w", newline="") as csvfile:
+            csv_headers = [
+                
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+            writer.writeheader()
+    key_datetime = pd.to_datetime([2021-05-03 17:06])
+    list_dates = [2021-05-04 17:06, 2021-05-04 17:06]
+    i = valid_list_dates.index(key_datetime)
+    valid_list_dates = sorted(filter(pd.to_datetime(x), list_dates))[i + 1:]
+    
+    
 
 def craigslist_soup(region, term, last_scrape):
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
@@ -128,7 +142,7 @@ def craigslist_soup(region, term, last_scrape):
             if neighborhood is not None:
                 neighborhood_text = neighborhood.get_text()
             else:
-                neighborhood_text == "No neighborhood provided"
+                neighborhood_text = "No neighborhood provided"
             result_listings = {
                 "cl_id": cl_id,
                 "created_at": created_at,
@@ -144,20 +158,22 @@ def craigslist_soup(region, term, last_scrape):
                 list_results.append(result_listings)
                 print(
                     f"the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-                )
+                ) 
             elif pd.to_datetime(result_listings["created_at"]) > (
                 pd.to_datetime(last_scrape)
             ):
                 list_results.append(result_listings)
                 print(
                     f"Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-                )
+                ) 
+
             else:
                 print(
                     f"Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this."
-                )
-
-        return list_results
+                ) 
+    else:
+        return ('API not OK')
+    return list_results
 
 
 def insert_into_csv_db(result_listings):
@@ -206,7 +222,7 @@ def post_to_slack(result_listings):
         for item in result_listings:
             sliced_description = item["description"]
             sliced_description = sliced_description[:100] + "..."
-            desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']} | {item['jpg']} "
+            desc = f"  {item['neighborhood_text']} | {item['created_at']} | {item['price']} | {item['title_text']} | {item['url']} | {sliced_description} | {item['cl_id']} |"
             response = client.chat_postMessage(channel=SLACK_CHANNEL, text=desc)
         print(
             "End Slack function {}: Got {} results".format(

@@ -1,4 +1,4 @@
-from scraper_bot import *
+# from scraper_bot import *
 import scraper_bot as scraper_bot
 import unittest
 import requests
@@ -6,6 +6,7 @@ import requests
 
 class TestSlackBot(unittest.TestCase):
     def test_handlers(self):
+        """Check if APIs are OK status"""
         api_handle_code = scraper_bot.craigslist_handler()
         self.assertEqual(api_handle_code, 0)
         api_handle_code = scraper_bot.slack_handler()
@@ -14,9 +15,12 @@ class TestSlackBot(unittest.TestCase):
         self.assertEqual(api_handle_code, 0)
 
     def check_csv(self):
+        """Check if listings are being written to CSV"""
         pass
 
-    # def test_lastscrape(self):
+    def test_lastscrape(self):
+        pass
+
     #     """To only scrape new listings (that are dated after the "last scrape")"""
     #     print(scraper_bot.craigslist_soup)
     #     self.assertEqual(
