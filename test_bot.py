@@ -6,11 +6,11 @@ import requests
 
 class TestSlackBot(unittest.TestCase):
     def test_handler(self):
-        apiHandleCode = scraper_bot.craigslist_handler(400)
+        apiHandleCode = scraper_bot.craigslist_handler()
         self.assertEqual(apiHandleCode, 1)
-        apiHandleCode = scraper_bot.slack_handler(402)
+        apiHandleCode = scraper_bot.slack_handler()
         self.assertEqual(apiHandleCode, 1)
-        apiHandleCode = scraper_bot.twilio_handler(200)
+        apiHandleCode = scraper_bot.twilio_handler()
         self.assertEqual(apiHandleCode, 0)
 
     def test_slack_api_success(self):

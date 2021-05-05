@@ -29,18 +29,13 @@ client = Client(account_sid, auth_token)
 my_phone_number = os.environ["my_phone_number"]
 
 
-def craigslist_handler(handler):
+def craigslist_handler():
     response = requests.get("craigslist.org")
-    if response == 400:
-        print("error 400")
-        return 1
-    if response == 402:
-        print("error 402")
-        return 1
-    ...
-    if response == 200:
-        print("success")
+    if response.status_code == 200:
         return 0
+    else:
+        return 1
+
 
 def create_csv():
     if not os.path.isfile("listings.csv"):
@@ -76,77 +71,79 @@ def craigslist_soup(region, term, last_scrape):
         region=region, term=term
     )
     response = requests.get(url=url)
-    soup = b_s(response.content, "html.parser")
-    posts = soup.find_all("li", class_="result-row")
-    links = []
-    image_jpg_list = []
-    posting_body = []
-    list_results = []
-    for post in posts:
-        title_class = post.find("a", class_="result-title hdrlnk")
-        links.append(title_class["href"])
-    for link in links:
-        response_link = requests.get(url=link)
-        link_soup = b_s(response_link.content, "html.parser")
-        image_url = link_soup.find("img")
-        if image_url is not None:
-            image_url = image_url["src"]
-        else:
-            image_url = "no image provided in this listing"
-        image_jpg_list.append(image_url)
-        section_body_class = link_soup.find("section", id="postingbody")
-        if section_body_class is not None:
-            section_body_class = section_body_class.get_text()
-        else:
-            section_body_class = "No description provided"
-        stripped = section_body_class.replace("\n\nQR Code Link to This Post\n", "")
-        final_strip = stripped.replace("\n\n", "")
-        posting_body.append(final_strip)
-    for index, post in enumerate(posts):
-        planter_description_full = posting_body[index]
-        image_url_jpg = image_jpg_list[index]
-        result_price = post.find("span", class_="result-price")
-        result_price_text = result_price.get_text()
-        time_class = post.find("time", class_="result-date")
-        created_at = time_class["datetime"]
-        title_class = post.find("a", class_="result-title hdrlnk")
-        url = title_class["href"]
-        cl_id = title_class["data-id"]
-        title_text = title_class.text
-        neighborhood = post.find("span", class_="result-hood")
-        if neighborhood is not None:
-            neighborhood_text = neighborhood.get_text()
-        else:
-            neighborhood_text == "No neighborhood provided"
-        result_listings = {
-            "cl_id": cl_id,
-            "created_at": created_at,
-            "title_text": title_text,
-            "price": result_price_text,
-            "neighborhood_text": neighborhood_text,
-            "url": url,
-            "description": planter_description_full,
-            "jpg": image_url_jpg,
-        }
+    if craigslist_handler() == 0:
+        print("hi")
+        soup = b_s(response.content, "html.parser")
+        posts = soup.find_all("li", class_="result-row")
+        links = []
+        image_jpg_list = []
+        posting_body = []
+        list_results = []
+        for post in posts:
+            title_class = post.find("a", class_="result-title hdrlnk")
+            links.append(title_class["href"])
+        for link in links:
+            response_link = requests.get(url=link)
+            link_soup = b_s(response_link.content, "html.parser")
+            image_url = link_soup.find("img")
+            if image_url is not None:
+                image_url = image_url["src"]
+            else:
+                image_url = "no image provided in this listing"
+            image_jpg_list.append(image_url)
+            section_body_class = link_soup.find("section", id="postingbody")
+            if section_body_class is not None:
+                section_body_class = section_body_class.get_text()
+            else:
+                section_body_class = "No description provided"
+            stripped = section_body_class.replace("\n\nQR Code Link to This Post\n", "")
+            final_strip = stripped.replace("\n\n", "")
+            posting_body.append(final_strip)
+        for index, post in enumerate(posts):
+            planter_description_full = posting_body[index]
+            image_url_jpg = image_jpg_list[index]
+            result_price = post.find("span", class_="result-price")
+            result_price_text = result_price.get_text()
+            time_class = post.find("time", class_="result-date")
+            created_at = time_class["datetime"]
+            title_class = post.find("a", class_="result-title hdrlnk")
+            url = title_class["href"]
+            cl_id = title_class["data-id"]
+            title_text = title_class.text
+            neighborhood = post.find("span", class_="result-hood")
+            if neighborhood is not None:
+                neighborhood_text = neighborhood.get_text()
+            else:
+                neighborhood_text == "No neighborhood provided"
+            result_listings = {
+                "cl_id": cl_id,
+                "created_at": created_at,
+                "title_text": title_text,
+                "price": result_price_text,
+                "neighborhood_text": neighborhood_text,
+                "url": url,
+                "description": planter_description_full,
+                "jpg": image_url_jpg,
+            }
 
-        if pd.isnull(pd.to_datetime(last_scrape)):
-            list_results.append(result_listings)
-            print(
-                f"the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-            )
-        elif pd.to_datetime(result_listings["created_at"]) > (
-            pd.to_datetime(last_scrape)
-        ):
-            list_results.append(result_listings)
-            print(
-                f"Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-            )
-        else:
-            print(
-                f"Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this."
-            )
+            if pd.isnull(pd.to_datetime(last_scrape)):
+                list_results.append(result_listings)
+                print(
+                    f"the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
+                )
+            elif pd.to_datetime(result_listings["created_at"]) > (
+                pd.to_datetime(last_scrape)
+            ):
+                list_results.append(result_listings)
+                print(
+                    f"Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
+                )
+            else:
+                print(
+                    f"Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this."
+                )
 
-    return list_results
+        return list_results
 
 
 def insert_into_csv_db(result_listings):
