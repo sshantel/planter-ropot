@@ -2,11 +2,12 @@
 import scraper_bot as scraper_bot
 import unittest
 import requests
+import csv
 
 
-class TestSlackBot(unittest.TestCase):
+class TestPlanterRopot(unittest.TestCase):
     def test_handlers(self):
-        """Check if APIs are OK status"""
+        """Check if Craigslist, Twilio, Slack are OK status"""
         api_handle_code = scraper_bot.craigslist_handler()
         self.assertEqual(api_handle_code, 0)
         api_handle_code = scraper_bot.slack_handler()
@@ -15,9 +16,11 @@ class TestSlackBot(unittest.TestCase):
         self.assertEqual(api_handle_code, 0)
 
     def test_csv(self):
-        """Check if listings are being written to CSV"""
-        readerObject = finaImport.importCSV("toe")
-        self.assertTrue(str(type(readerObject)), "_csv.reader")
+        """Check if CSV is CSV object"""
+        with open("listings.csv", "r") as csvfile:
+            csv_reader = csv.reader(csvfile)
+            next(csv_reader, None)
+        self.assertTrue(str(type(csv_reader)), "_csv.reader")
 
     def test_lastscrape(self):
         """Scraping only dates listed after the last_scrape using Mock Listings CSV"""
