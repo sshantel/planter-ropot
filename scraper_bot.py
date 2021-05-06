@@ -186,7 +186,7 @@ def craigslist_soup(region, term, last_scrape):
                     f"Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this."
                 )
     else:
-        return "API not OK"
+        return "Craigslist not OK"
     return list_results
 
 
@@ -221,7 +221,7 @@ def insert_into_csv_db(result_listings):
 
 
 def send_text_message(result_listings):
-    """Send text message using Twilio API""""
+    """Send text message using Twilio API"""
     if twilio_handler() == 0:
         for item in result_listings:
             if item["neighborhood_text"].strip().lower() == "(san francisco)":
@@ -230,6 +230,8 @@ def send_text_message(result_listings):
                     from_="+12054966699",
                     to="+1" + my_phone_number,
                 )
+    else:
+        return "Twilio not OK"
 
 
 def post_to_slack(result_listings):
@@ -246,6 +248,8 @@ def post_to_slack(result_listings):
                 datetime.now(), len(result_listings)
             )
         )
+    else:
+        return "Slack not OK"
 
 
 if __name__ == "__main__":
