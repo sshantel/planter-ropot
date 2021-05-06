@@ -19,20 +19,9 @@ class TestSlackBot(unittest.TestCase):
         pass
 
     def test_lastscrape(self):
-        """Test last scrape with mock CSV file"""
+        """Scraping only dates listed after the last_scrape"""
         mock_csv = scraper_bot.mock_scrape()
-        print(mock_csv)
-        pass
-
-    #     """To only scrape new listings (that are dated after the "last scrape")"""
-    #     print(scraper_bot.craigslist_soup)
-    #     self.assertEqual(
-    #         scraper_bot.craigslist_soup(
-    #             "denver",
-    #             "camry",
-    #             "2021-05-01 10:00",
-    #         )
-    #     )
+        self.assertEqual(mock_csv, [["2021-05-04 23:56:00"], ["2021-05-03 18:22:00"]])
 
 
 if __name__ == "__main__":

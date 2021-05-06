@@ -84,25 +84,28 @@ def get_last_scrape():
 def mock_scrape():
     """Mock listings for testing"""
     with open("mock_listings.csv", "w", newline="") as csvfile:
-        csv_headers = ["date"]
+        list_results = []
+        csv_headers = ["date_time"]
         key_datetime = pd.to_datetime("2021-05-03 17:06")
         list_dates = [
-            pd.to_datetime("2021-05-04 23:56"),
-            pd.to_datetime("2021-05-04 12:22"),
-            pd.to_datetime("2021-05-04 10:33"),
             pd.to_datetime("2021-04-30 8:34"),
+            pd.to_datetime("2021-05-04 23:56"),
+            pd.to_datetime("2021-04-01 10:33"),
+            pd.to_datetime("2021-05-03 18:22"),
             pd.to_datetime("2021-02-25 10:15"),
         ]
         writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
         writer.writeheader()
         for date in list_dates:
-            print(date)
-            writer.writerow({"date": date})
-    csvfile.close()
+            writer.writerow({"date_time": date})
 
-
-# i = valid_list_dates.index(key_datetime)
-#     valid_list_dates = sorted(filter(pd.to_datetime(x), list_dates))[i + 1 :]
+    with open("mock_listings.csv", "r") as csvfile:
+        csv_reader = csv.reader(csvfile)
+        next(csv_reader, None)
+        for row in csv_reader: 
+            if pd.to_datetime(row) > key_datetime:
+                list_results.append(row)
+    return list_results
 
 
 def craigslist_soup(region, term, last_scrape):
@@ -251,7 +254,6 @@ if __name__ == "__main__":
         )
         try:
             create_csv()
-            mock_scrape()
             c_l = craigslist_soup(
                 region="sfbay", term="planter", last_scrape=get_last_scrape()
             )
