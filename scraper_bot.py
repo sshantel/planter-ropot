@@ -102,13 +102,14 @@ def mock_scrape():
     with open("mock_listings.csv", "r") as csvfile:
         csv_reader = csv.reader(csvfile)
         next(csv_reader, None)
-        for row in csv_reader: 
+        for row in csv_reader:
             if pd.to_datetime(row) > key_datetime:
                 list_results.append(row)
     return list_results
 
 
 def craigslist_soup(region, term, last_scrape):
+    """Scraping Craigslist"""
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
         region=region, term=term
     )
@@ -190,6 +191,7 @@ def craigslist_soup(region, term, last_scrape):
 
 
 def insert_into_csv_db(result_listings):
+    """Adding data to CSV flat file"""
     with open("listings.csv", "a") as csvfile:
         fieldnames = [
             "id",
@@ -219,6 +221,7 @@ def insert_into_csv_db(result_listings):
 
 
 def send_text_message(result_listings):
+    """Send text message using Twilio API""""
     if twilio_handler() == 0:
         for item in result_listings:
             if item["neighborhood_text"].strip().lower() == "(san francisco)":
@@ -230,6 +233,7 @@ def send_text_message(result_listings):
 
 
 def post_to_slack(result_listings):
+    """Post scraped data to Slack"""
     client = WebClient(SLACK_TOKEN)
     if slack_handler() == 0:
         for item in result_listings:
