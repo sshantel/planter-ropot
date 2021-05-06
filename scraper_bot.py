@@ -109,7 +109,7 @@ def mock_scrape():
 
 
 def craigslist_soup(region, term, last_scrape):
-    """Scraping Craigslist"""
+    """Scraping Craigslist data for queried search"""
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
         region=region, term=term
     )

@@ -1,5 +1,4 @@
-# from scraper_bot import *
-import scraper_bot as scraper_bot
+from scraper_bot import *
 import unittest
 import requests
 import csv
