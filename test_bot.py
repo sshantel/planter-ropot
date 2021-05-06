@@ -16,10 +16,11 @@ class TestSlackBot(unittest.TestCase):
 
     def test_csv(self):
         """Check if listings are being written to CSV"""
-        pass
+        readerObject = finaImport.importCSV("toe")
+        self.assertTrue(str(type(readerObject)), "_csv.reader")
 
     def test_lastscrape(self):
-        """Scraping only dates listed after the last_scrape"""
+        """Scraping only dates listed after the last_scrape using Mock Listings CSV"""
         mock_csv = scraper_bot.mock_scrape()
         self.assertEqual(mock_csv, [["2021-05-04 23:56:00"], ["2021-05-03 18:22:00"]])
 
