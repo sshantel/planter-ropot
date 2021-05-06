@@ -14,7 +14,7 @@ class TestSlackBot(unittest.TestCase):
         api_handle_code = scraper_bot.twilio_handler()
         self.assertEqual(api_handle_code, 0)
 
-    def check_csv(self):
+    def test_csv(self):
         """Check if listings are being written to CSV"""
         pass
 
