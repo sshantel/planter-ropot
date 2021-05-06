@@ -80,20 +80,30 @@ def get_last_scrape():
 
     return last_scrape
 
+
 def mock_scrape():
-    if not os.path.isfile("mock_listings.csv"):
-        with open("mock_listings.csv", "w", newline="") as csvfile:
-            csv_headers = [
-                
-            ]
-            writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
-            writer.writeheader()
-    key_datetime = pd.to_datetime([2021-05-03 17:06])
-    list_dates = [2021-05-04 17:06, 2021-05-04 17:06]
-    i = valid_list_dates.index(key_datetime)
-    valid_list_dates = sorted(filter(pd.to_datetime(x), list_dates))[i + 1:]
-    
-    
+    """Mock listings for testing"""
+    with open("mock_listings.csv", "w", newline="") as csvfile:
+        csv_headers = ["date"]
+        key_datetime = pd.to_datetime("2021-05-03 17:06")
+        list_dates = [
+            pd.to_datetime("2021-05-04 23:56"),
+            pd.to_datetime("2021-05-04 12:22"),
+            pd.to_datetime("2021-05-04 10:33"),
+            pd.to_datetime("2021-04-30 8:34"),
+            pd.to_datetime("2021-02-25 10:15"),
+        ]
+        writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+        writer.writeheader()
+        for date in list_dates:
+            print(date)
+            writer.writerow({"date": date})
+    csvfile.close()
+
+
+# i = valid_list_dates.index(key_datetime)
+#     valid_list_dates = sorted(filter(pd.to_datetime(x), list_dates))[i + 1 :]
+
 
 def craigslist_soup(region, term, last_scrape):
     url = "https://{region}.craigslist.org/search/sss?query={term}".format(
@@ -158,21 +168,21 @@ def craigslist_soup(region, term, last_scrape):
                 list_results.append(result_listings)
                 print(
                     f"the datetime is null. Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-                ) 
+                )
             elif pd.to_datetime(result_listings["created_at"]) > (
                 pd.to_datetime(last_scrape)
             ):
                 list_results.append(result_listings)
                 print(
                     f"Listing posted {created_at} and last scrapetime {last_scrape} so we will append this AND POST TO SLACK"
-                ) 
+                )
 
             else:
                 print(
                     f"Listing posted {created_at} and last scrapetime {last_scrape}. We will not append this."
-                ) 
+                )
     else:
-        return ('API not OK')
+        return "API not OK"
     return list_results
 
 
@@ -241,6 +251,7 @@ if __name__ == "__main__":
         )
         try:
             create_csv()
+            mock_scrape()
             c_l = craigslist_soup(
                 region="sfbay", term="planter", last_scrape=get_last_scrape()
             )

@@ -19,6 +19,9 @@ class TestSlackBot(unittest.TestCase):
         pass
 
     def test_lastscrape(self):
+        """Test last scrape with mock CSV file"""
+        mock_csv = scraper_bot.mock_scrape()
+        print(mock_csv)
         pass
 
     #     """To only scrape new listings (that are dated after the "last scrape")"""
