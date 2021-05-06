@@ -69,8 +69,6 @@ def create_csv():
             writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
             writer.writeheader()
 
-    return csvfile
-
 
 def get_last_scrape():
     with open("listings.csv", newline="") as csvfile:
